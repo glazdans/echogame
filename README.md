@@ -1,3 +1,3 @@
 # echogame
 My hobby project
-a duhh
+(Not complete nor does have any worth wile features to learn from)
