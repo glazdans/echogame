@@ -11,7 +11,7 @@ public class TestScreen implements Screen {
     private GdxGame game;
 
     private ShapeRenderer shapeRenderer;
-
+    //This is a comment
 
     Array<Disposable> disposables = new Array<Disposable>();
 
