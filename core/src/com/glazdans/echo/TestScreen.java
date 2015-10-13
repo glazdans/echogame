@@ -12,6 +12,8 @@ public class TestScreen implements Screen {
 
     private ShapeRenderer shapeRenderer;
     //This is a comment s
+    //This is a edit for branch
+    // Test commit
 
     Array<Disposable> disposables = new Array<Disposable>();
 
