@@ -16,17 +16,22 @@ public class TestScreen implements Screen {
     DebugRenderer renderer;
     World world;
     Input input;
+    Physics physics;
     Array<Disposable> disposables = new Array<>();
+
+
 
     public TestScreen(GdxGame game) {
         this.game = game;
 
         world = new World();
         renderer = new DebugRenderer();
+        physics= new Physics();
         disposables.add(renderer);
 
         Entity entity = new Entity();
         entity.mousePosition.set(0 ,30);
+        entity.position.set(40,40);
         world.addEntity(entity);
         input = new Input(entity.id);
 
@@ -41,7 +46,7 @@ public class TestScreen implements Screen {
     @Override
     public void render(float delta) {
         DebugRenderer.camera.update();
-        input.updateInput();
+        input.updateInput(delta);
         world.update();
 
         Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);

@@ -23,12 +23,15 @@ public class DebugRenderer implements Disposable {
         camera.update();
         renderer.setProjectionMatrix(camera.combined);
         renderer.begin(ShapeRenderer.ShapeType.Line);
+        for(Terrain t : Physics.getCurrentInstance().levelObjects){
+            renderer.setColor(Color.RED);
+            renderer.rect(t.position.x,t.position.y,Physics.TILE_SIZE,Physics.TILE_SIZE);
+        }
         for(Entity entity : World.currentInstance().entities){
             renderer.setColor(Color.WHITE);
-            renderer.circle(entity.position.x,entity.position.y,testRadiuss);
-
-            renderer.setColor(Color.BLUE);
-            renderer.line(entity.position.x,entity.position.y,entity.position.x+entity.mousePosition.x,entity.position.y+entity.mousePosition.y);
+            renderer.rect(entity.position.x, entity.position.y, Physics.TILE_SIZE, Physics.TILE_SIZE);
+            renderer.setColor(Color.WHITE);
+            renderer.line(entity.position.x+8,entity.position.y+8,entity.position.x+entity.mousePosition.x,entity.position.y+entity.mousePosition.y);
         }
         renderer.end();
     }

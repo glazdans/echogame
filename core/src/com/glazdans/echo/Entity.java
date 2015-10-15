@@ -18,11 +18,8 @@ public class Entity {
 
     public void setCommand(Command command){
         newPosition.set(command.position);
-        mousePosition.set(command.mousePosition.sub(command.position));
-        mousePosition.nor().scl(30f);
-        Gdx.app.debug("Entity command method",mousePosition.toString());
-        Gdx.app.debug("Entity  command.mousePosition",command.mousePosition.toString());
-        Gdx.app.debug("Entity command.position",command.position.toString());
+        mousePosition.set(command.mousePosition.sub(command.position.add(8,8)));
+        mousePosition.nor().scl(100f);
     }
 
     public void update(){
