@@ -29,7 +29,8 @@ public class Input extends InputAdapter {
         command.mousePosition.set(tmp.x, tmp.y);
 
         generateInputVector(directionVector);
-        entity.position.add(directionVector.nor().scl(100 * delta));
+        //entity.position.add(directionVector.nor().scl(100 * delta));
+        entity.velocity.add(directionVector.nor().scl(100 * delta));
         command.position.set(entity.position);
 
         World.currentInstance().addCommandToQueue(command);

@@ -21,7 +21,7 @@ public class Physics {
 
     private static Rectangle tmp1 = new Rectangle();
     private static Rectangle tmp2 = new Rectangle();
-    public static boolean areColliding(Entity e, Terrain t){
+    public static boolean areColliding(Entity e, Entity t){
         tmp1.set(e.position.x,e.position.y,TILE_SIZE,TILE_SIZE);
         tmp2.set(t.position.x,t.position.y,TILE_SIZE,TILE_SIZE);
         return tmp1.overlaps(tmp2);

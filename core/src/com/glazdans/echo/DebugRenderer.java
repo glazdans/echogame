@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Disposable;
 
 public class DebugRenderer implements Disposable {
@@ -18,7 +19,7 @@ public class DebugRenderer implements Disposable {
         camera.position.set(0,0,0);
     }
 
-
+    private static Vector3 tmp = new Vector3();
     public void draw(){
         camera.update();
         renderer.setProjectionMatrix(camera.combined);
@@ -32,7 +33,11 @@ public class DebugRenderer implements Disposable {
             renderer.rect(entity.position.x, entity.position.y, Physics.TILE_SIZE, Physics.TILE_SIZE);
             renderer.setColor(Color.WHITE);
             renderer.line(entity.position.x+8,entity.position.y+8,entity.position.x+entity.mousePosition.x,entity.position.y+entity.mousePosition.y);
+            renderer.setColor(Color.RED);
+            renderer.line(entity.position.x,entity.position.y,entity.position.x+entity.mousePosition.x,entity.position.y+entity.mousePosition.y);
         }
+        tmp = camera.unproject(tmp.set(Gdx.input.getX(), Gdx.input.getY(),0));
+        renderer.circle(tmp.x,tmp.y, 10);
         renderer.end();
     }
     @Override
