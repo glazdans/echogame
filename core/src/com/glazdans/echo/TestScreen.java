@@ -33,7 +33,7 @@ public class TestScreen implements Screen {
 
         Entity entity = new Entity(10f);
         entity.mousePosition.set(0 ,30);
-        entity.position.set(40,40);
+        entity.position.set(40,100);
 
         world.addEntity(entity);
         input = new Input(entity.id);
@@ -43,7 +43,7 @@ public class TestScreen implements Screen {
 
         entity = new Entity(10f);
         entity.position.set(100,100);
-        entity.velocity.set(-10,0);
+        entity.velocity.set(-15,0);
         world.addEntity(entity);
         physicsEngine.collisionList.add(entity);
 

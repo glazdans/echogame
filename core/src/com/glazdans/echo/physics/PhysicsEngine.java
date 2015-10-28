@@ -18,6 +18,13 @@ public class PhysicsEngine {
     private static Vector2 tmp = new Vector2();
     public void update(float delta, Entity player){
         for(Entity e : collisionList){
+            tmp.set(e.velocity);
+            e.position.add(tmp.scl(delta));
+        }
+        tmp.set(player.velocity);
+        player.position.add(tmp.scl(delta));
+
+        for(Entity e : collisionList){
             if(Physics.areColliding(player,e)) {
 
                 Manifold m = new Manifold();
@@ -28,28 +35,25 @@ public class PhysicsEngine {
             }
         }
 
-        for(Entity e : collisionList){
-            tmp.set(e.velocity);
-            e.position.add(tmp.scl(delta));
-        }
-        tmp.set(player.velocity);
-        player.position.add(tmp.scl(delta));
     }
 
     public void ResolveCollision( Entity A, Entity B, Manifold m)
     {
         Gdx.app.log("Physics update","Resolving collision");
         // Calculate relative velocity
+
         tmp.set(B.velocity);
         Vector2 rv = tmp.sub(A.velocity);
 
         // Calculate relative velocity in terms of the normal direction
         float velAlongNormal = rv.dot(m.normal);
+        Gdx.app.log("Physics update: Normal:",m.normal.toString());
 
-        // Do not resolve if velocities are separating
-        if(velAlongNormal > 0)
-            return;
-
+         // Do not resolve if velocities are separating
+         if(velAlongNormal > 0) {
+             Gdx.app.log("Physics update: Normal:", "returning");
+             return;
+         }
         // Calculate restitution
         float e = Math.min(A.restitution, B.restitution);
 
@@ -58,9 +62,9 @@ public class PhysicsEngine {
         j /= 1 / A.mass + 1 / B.mass;
 
         // Apply impulse
-        Vector2 impulse =m.normal.scl(j);
+        Vector2 impulse = m.normal.scl(j);
 
-        A.velocity.add(impulse.scl(-1 / A.mass));
+        A.velocity.add(impulse.scl(1 / A.mass*-1));
         B.velocity.add(impulse.scl(1 / B.mass));
     }
 
@@ -99,7 +103,7 @@ public class PhysicsEngine {
                 {
                     // Point towards B knowing that n points from A to B
                     if(n.x < 0)
-                        m.normal.set( -1f, 0f );
+                        m.normal.set(-1f, 0f );
                     else
                         m.normal.set(1f, 0f);
                     m.penetration = x_overlap;
