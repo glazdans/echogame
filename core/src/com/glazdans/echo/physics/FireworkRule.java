@@ -1,5 +1,6 @@
 package com.glazdans.echo.physics;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 
 /**
@@ -13,7 +14,7 @@ public class FireworkRule {
     Vector3 maxVelocity;
     float damping;
 
-    public static class Payload{
+    public static class Payload {
         int type;
         int count;
     }
@@ -22,7 +23,25 @@ public class FireworkRule {
 
     Payload payload;
 
-    public void create(Firework firework, Firework parent){
+    private static Vector3 tmp = new Vector3();
 
+    public Firework create(Firework firework, Firework parent) {
+        firework.type = type;
+        firework.age = MathUtils.random(minAge, maxAge);
+
+        if (parent != null) {
+            firework.velocity.set(parent.velocity);
+            firework.position.set(parent.position);
+        }
+        tmp.set(MathUtils.random(minVelocity.x, maxVelocity.x), MathUtils.random(minVelocity.y, maxVelocity.y), MathUtils.random(minVelocity.z, maxVelocity.z));
+        firework.velocity.add(tmp);
+
+        firework.setMass(1);
+        firework.damping = damping;
+
+        firework.acceleration.set(Particle.globalGravity);
+        firework.forceAccum.set(0,0,0);
+
+        return firework;
     }
 }

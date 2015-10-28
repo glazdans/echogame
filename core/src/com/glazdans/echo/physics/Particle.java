@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector3;
  * Created by georgs.lazdans on 2015.10.28..
  */
 public class Particle {
+    public static final Vector3 globalGravity = new Vector3(0,-60,0);
     Vector3 position;
     Vector3 velocity;
     Vector3 acceleration;
@@ -17,15 +18,23 @@ public class Particle {
 
     float inverseMass;
 
+    public Particle(){
+        position = new Vector3();
+        velocity = new Vector3();
+        acceleration = new Vector3();
+        forceAccum = new Vector3();
+    }
+
+    public void setMass(float mass){
+        if(mass == 0){
+            inverseMass = 0;
+        }
+        else{
+            inverseMass = 1/mass;
+        }
+    }
 
     private static Vector3 tmp = new Vector3();
-
-    public void update(float time){
-        tmp.set(velocity).scl(time);
-        position.add(tmp);
-        tmp.set(acceleration).scl(time*time*0.5f);
-        position.add(tmp);
-    }
 
     void integrate(float duration){
         // Update linear position
