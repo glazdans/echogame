@@ -25,6 +25,14 @@ public class Particle {
         forceAccum = new Vector3();
     }
 
+    public void clearAccumulator(){
+        forceAccum.set(0,0,0);
+    }
+
+    public void addForce(Vector3 force){
+        forceAccum.add(force);
+    }
+
     public void setMass(float mass){
         if(mass == 0){
             inverseMass = 0;
@@ -48,11 +56,12 @@ public class Particle {
         resultingAcc.add(tmp);
 
         // Update linear velocity from the acceleration.
-
         velocity.add(resultingAcc.scl(duration));
 
         // Impose drag.
         velocity.scl((float) Math.pow(damping,duration));
 
+        // Clear the forces
+        clearAccumulator();
     }
 }
