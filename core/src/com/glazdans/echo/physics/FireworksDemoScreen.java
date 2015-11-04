@@ -131,7 +131,6 @@ public class FireworksDemoScreen implements Screen {
             }
         }
         spriteBatch.end();
-        System.out.println(fireworkPool.peak);
     }
 
     @Override

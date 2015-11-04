@@ -8,8 +8,8 @@ import com.badlogic.gdx.math.Vector3;
  */
 public class Particle {
     public static final Vector3 globalGravity = new Vector3(0,-60,0);
-    Vector3 position;
-    Vector3 velocity;
+    public Vector3 position;
+    public Vector3 velocity;
     Vector3 acceleration;
 
     Vector3 forceAccum;

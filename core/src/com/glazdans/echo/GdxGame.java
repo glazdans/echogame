@@ -9,13 +9,13 @@ import com.glazdans.echo.physics.FireworksDemoScreen;
 
 public class GdxGame extends Game {
 
-	TestScreen testScreen;
+    TestScreen testScreen;
 
-	@Override
-	public void create () {
-		testScreen = new TestScreen(this);
-		setScreen(new FireworksDemoScreen());
-	}
+    @Override
+    public void create() {
+        testScreen = new TestScreen(this);
+        setScreen(new FireworksDemoScreen());
+    }
 
-
+/**/
 }

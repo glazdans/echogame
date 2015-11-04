@@ -6,6 +6,7 @@ import com.glazdans.echo.Entity;
 /**
  * Created by georgs.lazdans on 2015.10.17..
  */
+@Deprecated
 public class Manifold {
     public Entity a;
     public Entity b;

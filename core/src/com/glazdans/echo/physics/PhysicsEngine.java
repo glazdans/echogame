@@ -7,7 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.glazdans.echo.Entity;
 import com.glazdans.echo.Physics;
-
+@Deprecated
 public class PhysicsEngine {
     public Array<Entity> collisionList;
 
