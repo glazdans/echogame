@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.glazdans.echo.physics.FireworksDemoScreen;
+import com.glazdans.echo.physics.blob.BlobScreen;
 
 public class GdxGame extends Game {
 
@@ -14,7 +15,7 @@ public class GdxGame extends Game {
     @Override
     public void create() {
         testScreen = new TestScreen(this);
-        setScreen(new FireworksDemoScreen());
+        setScreen(new BlobScreen());
     }
 
 /**/

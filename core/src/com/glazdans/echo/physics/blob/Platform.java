@@ -13,6 +13,11 @@ public class Platform implements ParticleContactGenerator {
     Vector3 end;
     Array<Particle> particles;
 
+    public Platform(){
+        start = new Vector3();
+        end = new Vector3();
+    }
+
     @Override
     public int addContact(Array<ParticleContact> contacts, int limit) {
         int used = 0;

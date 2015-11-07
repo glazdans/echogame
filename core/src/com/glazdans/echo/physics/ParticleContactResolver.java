@@ -26,8 +26,8 @@ public class ParticleContactResolver {
                     maxIndex = i;
                 }
                 contacts.get(maxIndex).resolve(duration);
-                iterationsUsed++;
             }
+            iterationsUsed++;
         }
     }
 }

@@ -3,49 +3,55 @@ package com.glazdans.echo.physics;
 import com.badlogic.gdx.utils.Array;
 
 public class ParticleWorld {
-    Array<Particle> particles;
+    public Array<Particle> particles;
 
-    ParticleForceRegistry registry;
+    public ParticleForceRegistry registry;
 
-    ParticleContactResolver resolver;
+    public ParticleContactResolver resolver;
 
-    Array<ParticleContactGenerator> generators;
+    public Array<ParticleContactGenerator> generators;
 
     Array<ParticleContact> contacts;
 
     int maxContacts;
 
-    public ParticleWorld(int maxContacts,int iterations){
-
+    public ParticleWorld(int maxContacts, int iterations) {
+        generators = new Array<>();
+        contacts = new Array<>();
+        particles = new Array<>();
+        contacts = new Array<>();
+        registry = new ParticleForceRegistry();
+        resolver = new ParticleContactResolver(iterations);
     }
-    public void startFrame(){
-        for(Particle p : particles){
+
+    public void startFrame() {
+        for (Particle p : particles) {
             p.clearAccumulator();
         }
     }
 
-    public int generateContacts(){
+    public int generateContacts() {
         int limit = maxContacts;
-        for(ParticleContactGenerator generator : generators){
-            int used = generator.addContact(contacts,limit);
-            limit -=used;
+        for (ParticleContactGenerator generator : generators) {
+            int used = generator.addContact(contacts, limit);
+            limit -= used;
 
-            if(limit<= 0) break;
+            if (limit <= 0) break;
         }
         return maxContacts - limit;
     }
 
-    public void integrate(float duration){
-        for(Particle p : particles){
+    public void integrate(float duration) {
+        for (Particle p : particles) {
             p.integrate(duration);
         }
     }
 
-    void runPhysics(float duration){
+    public void runPhysics(float duration) {
         registry.updateForces(duration);
 
         integrate(duration);
 
-        resolver.resolveContacts(contacts,duration);
+        resolver.resolveContacts(contacts, duration);
     }
 }

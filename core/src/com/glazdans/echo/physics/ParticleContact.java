@@ -12,7 +12,7 @@ public class ParticleContact {
     public float restitution;
     public Vector3 contactNormal;
     public float penetration;
-    // 110 lpp
+
     private static Vector3 tmp = new Vector3();
 
     public void resolve(float duration) {

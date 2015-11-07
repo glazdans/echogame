@@ -10,11 +10,11 @@ public class Particle {
     public static final Vector3 globalGravity = new Vector3(0,-60,0);
     public Vector3 position;
     public Vector3 velocity;
-    Vector3 acceleration;
+    public Vector3 acceleration;
 
     Vector3 forceAccum;
 
-    float damping;
+    public float damping;
 
     float inverseMass;
 
