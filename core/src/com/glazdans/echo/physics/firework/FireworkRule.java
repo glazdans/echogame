@@ -42,7 +42,7 @@ public class FireworkRule {
         firework.damping = damping;
 
         firework.acceleration.set(Particle.globalGravity);
-        firework.forceAccum.set(0,0,0);
+        //firework.forceAccum.set(0,0,0);
 
         return firework;
     }

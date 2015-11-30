@@ -1,6 +1,7 @@
 package com.glazdans.echo;
 
 import com.badlogic.gdx.Game;
+import com.glazdans.echo.bullet.BulletTestScreen;
 import com.glazdans.echo.physics.blob.BlobScreen;
 
 public class GdxGame extends Game {
@@ -10,7 +11,7 @@ public class GdxGame extends Game {
     @Override
     public void create() {
         testScreen = new TestScreen(this);
-        setScreen(new BlobScreen());
+        setScreen(new BulletTestScreen(this));
     }
 
 /**/

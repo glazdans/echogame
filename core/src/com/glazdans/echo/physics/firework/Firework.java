@@ -14,7 +14,7 @@ public class Firework extends Particle implements Pool.Poolable{
         super();
     }
     public void update(float duration){
-        integrate(duration);
+        //integrate(duration);
 
         age -= duration;
     }
@@ -23,11 +23,11 @@ public class Firework extends Particle implements Pool.Poolable{
     public void reset() {
         age = 0;
         type = 0;
-        forceAccum.set(0,0,0);
+        //forceAccum.set(0,0,0);
         damping = .9f;
         acceleration.set(0,0,0);
         velocity.set(0,0,0);
         position.set(0,0,0);
-        inverseMass = 1;
+        //inverseMass = 1;
     }
 }

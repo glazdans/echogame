@@ -2,52 +2,152 @@ package com.glazdans.echo.bullet;
 
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
+import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.physics.bullet.DebugDrawer;
 import com.badlogic.gdx.physics.bullet.collision.*;
+import com.badlogic.gdx.physics.bullet.dynamics.*;
+import com.badlogic.gdx.physics.bullet.linearmath.btIDebugDraw;
+import com.badlogic.gdx.physics.bullet.linearmath.btMotionState;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
+import com.glazdans.echo.GdxGame;
+import com.glazdans.echo.bullet.input.PlayerController;
+
+import java.util.ArrayList;
 
 public class BulletTestScreen implements Screen {
+
     class MyContactListener extends ContactListener{
         @Override
-        public boolean onContactAdded(int userValue0, int partId0, int index0, int userValue1, int partId1, int index1) {
-            return super.onContactAdded(userValue0, partId0, index0, userValue1, partId1, index1);
+        public void onContactEnded(btCollisionObject colObj0, btCollisionObject colObj1) {
+            Gdx.app.log("OnContactAded",": contacts!");
+            super.onContactEnded(colObj0, colObj1);
         }
     }
-    
+    static class MyMotionState extends btMotionState{
+        Matrix4 transform;
+
+        @Override
+        public void getWorldTransform(Matrix4 worldTrans) {
+            worldTrans.set(transform);
+        }
+
+        @Override
+        public void setWorldTransform(Matrix4 worldTrans) {
+            transform.set(worldTrans);
+        }
+    }
+
+    public static class GameObject implements Disposable{
+        public btRigidBody rigidBody;
+        public boolean isGrounded;
+        public MyMotionState motionState;
+        public Matrix4 transform;
+
+        @Override
+        public void dispose() {
+            rigidBody.dispose();
+        }
+
+        public GameObject(btRigidBody.btRigidBodyConstructionInfo constructionInfo) {
+            rigidBody = new btRigidBody(constructionInfo);
+            //motionState = new MyMotionState();
+            //motionState.transform = transform;
+            //rigidBody.setMotionState(motionState);
+        }
+        public void update(float delta){
+            if(!isGrounded){
+                rigidBody.setWorldTransform(rigidBody.getWorldTransform().translate(0,-9f*delta,0));
+            }
+
+        }
+    }
+    final GdxGame gdxGame;
+    Array<GameObject> gameObjects;
     DebugDrawer debugDrawer;
 
     btCollisionConfiguration collisionConfig;
-    btDispacher dispatcher;
+    btDispatcher dispatcher;
     MyContactListener contactListener;
     btBroadphaseInterface broadphase;
-    btCollisionWorld collisionWorld;
+
+    btDynamicsWorld dynamicsWorld;
+    btConstraintSolver constraintSolver;
+
+    GameObject cameraObject;
+    PlayerController playerController;
+    InputMultiplexer inputMultiplexer;
 
 
     private PerspectiveCamera camera;
     CameraInputController cameraInputController;
 
-    public BulletTestScreen(){
-        debugDrawer = new DebugDrawer();
-        camera = new PerspectiveCamera();
+    public BulletTestScreen(GdxGame game){
+        this.gdxGame = game;
+        Bullet.init();
+        gameObjects = new Array<>();
+        camera = new PerspectiveCamera(80,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+        camera.position.set(new Vector3(19,12.5f,6));
         cameraInputController = new CameraInputController(camera);
-        Gdx.input.setInputProcessor(cameraInputController);
+
         initBullet();
+        playerController = new PlayerController(cameraObject,camera);
+        inputMultiplexer = new InputMultiplexer();
+        inputMultiplexer.addProcessor(cameraInputController);
+        inputMultiplexer.addProcessor(playerController);
+        Gdx.input.setInputProcessor(inputMultiplexer);
     }
 
     private void initBullet(){
-
-        Bullet.init();
         collisionConfig = new btDefaultCollisionConfiguration();
         dispatcher = new btCollisionDispatcher(collisionConfig);
-        broadpahes = new btDbvtBroadphase();
-        collisionWorld = new btCollisionWorld(dispatcher,broadphase,collisionConfig);
+        broadphase = new btDbvtBroadphase();
+        constraintSolver = new btSequentialImpulseConstraintSolver();
+        dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher,broadphase,constraintSolver,collisionConfig);
+        dynamicsWorld.setGravity(new Vector3(0,-5f,0));
         contactListener = new MyContactListener();
+        debugDrawer = new DebugDrawer();
+        debugDrawer.setDebugMode(btIDebugDraw.DebugDrawModes.DBG_MAX_DEBUG_DRAW_MODE);
+        dynamicsWorld.setDebugDrawer(debugDrawer);
+        createObjects();
+    }
+    private void createObjects(){
+        btBoxShape box = new btBoxShape(new Vector3(10,1,10));
+        Vector3 localInertia = new Vector3();
+        float mass = 0f;
+        if(mass >0)
+            box.calculateLocalInertia(mass,localInertia);
+        btRigidBody.btRigidBodyConstructionInfo constructionInfo = new btRigidBody.btRigidBodyConstructionInfo(mass,null,box,localInertia);
+        GameObject gameObject = new GameObject(constructionInfo);
+        gameObject.rigidBody.setCollisionFlags(btCollisionObject.CollisionFlags.CF_STATIC_OBJECT);
+        gameObject.rigidBody.setActivationState(Collision.DISABLE_DEACTIVATION);
+        dynamicsWorld.addRigidBody(gameObject.rigidBody);
+        gameObjects.add(gameObject);
+
+        btCapsuleShape capsuleShape = new btCapsuleShape(0.5f,3f);
+        localInertia = new Vector3();
+        mass = 4f;
+        if(mass >0)
+            capsuleShape.calculateLocalInertia(mass,localInertia);
+        constructionInfo = new btRigidBody.btRigidBodyConstructionInfo(mass,null,capsuleShape,localInertia);
+        gameObject = new GameObject(constructionInfo);
+        gameObject.rigidBody.setCollisionFlags(btCollisionObject.CollisionFlags.CF_KINEMATIC_OBJECT);
+        gameObject.rigidBody.setActivationState(Collision.DISABLE_DEACTIVATION);
+        gameObject.rigidBody.setWorldTransform(new Matrix4().setTranslation(0,10,0));
+        dynamicsWorld.addRigidBody(gameObject.rigidBody);
+        gameObjects.add(gameObject);
+        cameraObject = gameObject;
 
     }
+
     @Override
     public void show() {
 
@@ -55,12 +155,22 @@ public class BulletTestScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        Gdx.gl.glClearColor(0.1f, 0.1f, 0.1f, 1);
+        cameraObject.update(delta);
+        dynamicsWorld.stepSimulation(delta,5,1/60f);
+        camera.lookAt(cameraObject.rigidBody.getWorldTransform().getTranslation(new Vector3()));
+        camera.update();
+        Gdx.gl.glClearColor(0.05f, 0.05f, 0.05f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
+        if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
+            new Boolean("false");
+        }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.R)){
+            gdxGame.setScreen(new BulletTestScreen(gdxGame));
+        }
+
         debugDrawer.begin(camera);
-        collisionWorld.setDebugDrawer(debugDrawer);
-        collisionWorld.debugDrawWorld();
+        dynamicsWorld.debugDrawWorld();
         debugDrawer.end();
     }
 
