@@ -1,6 +1,7 @@
-package com.glazdans.echo.physics;
+package com.glazdans.echo.physics.firework;
 
 import com.badlogic.gdx.utils.Pool;
+import com.glazdans.echo.physics.Particle;
 
 /**
  * Created by georgs.lazdans on 2015.10.28..

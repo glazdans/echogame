@@ -1,4 +1,4 @@
-package com.glazdans.echo.physics;
+package com.glazdans.echo.physics.firework;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -11,6 +11,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
+import com.glazdans.echo.physics.firework.Firework;
+import com.glazdans.echo.physics.firework.FireworkRule;
 
 public class FireworksDemoScreen implements Screen {
 

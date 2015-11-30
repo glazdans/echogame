@@ -18,7 +18,7 @@ public class ParticleContactResolver {
         iterationsUsed = 0;
         while(iterationsUsed < iterations){
             float max = 0;
-            int maxIndex = contacts.size;
+            int maxIndex = contacts.size-1;
             for(int i = 0; i < contacts.size; i++){
                 float sepVel = contacts.get(i).calculateSeparatingVelocity();
                 if(sepVel<max){

@@ -1,7 +1,9 @@
-package com.glazdans.echo.physics;
+package com.glazdans.echo.physics.firework;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
+import com.glazdans.echo.physics.Particle;
+import com.glazdans.echo.physics.firework.Firework;
 
 /**
  * Created by georgs.lazdans on 2015.10.28..

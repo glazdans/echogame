@@ -31,6 +31,7 @@ public class ParticleWorld {
     }
 
     public int generateContacts() {
+        contacts.clear();
         int limit = maxContacts;
         for (ParticleContactGenerator generator : generators) {
             int used = generator.addContact(contacts, limit);
@@ -51,6 +52,8 @@ public class ParticleWorld {
         registry.updateForces(duration);
 
         integrate(duration);
+
+        generateContacts();
 
         resolver.resolveContacts(contacts, duration);
     }

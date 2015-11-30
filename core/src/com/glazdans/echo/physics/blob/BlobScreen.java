@@ -96,6 +96,9 @@ public class BlobScreen implements Screen {
 
     @Override
     public void render(float delta) {
+        if(delta > 1/30f){
+            delta =1/30f;
+        }
         if(Gdx.input.isButtonPressed(Input.Keys.LEFT)){
             xAxis -=1;
         }
@@ -110,7 +113,7 @@ public class BlobScreen implements Screen {
         }
         world.startFrame();
 
-        blobs.get(0).addForce(new Vector3(xAxis,yAxis,0).scl(10f));
+        blobs.get(0).addForce(new Vector3(xAxis,yAxis,0).scl(100f));
 
         world.runPhysics(delta);
 
@@ -135,7 +138,7 @@ public class BlobScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-        camera.setToOrtho(false,width/5,height/5);
+        camera.setToOrtho(false,width/6,height/6);
     }
 
     @Override
