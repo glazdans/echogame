@@ -25,11 +25,21 @@ import java.util.ArrayList;
 
 public class BulletTestScreen implements Screen {
 
-    class MyContactListener extends ContactListener{
+    final static short GROUND_FLAG = 1<<8;
+    final static short OBJECT_FLAG = 1<<9;
+    final static short ALL_FLAG = -1;
+
+    class MyContactListener extends ContactListener {
+
         @Override
-        public void onContactEnded(btCollisionObject colObj0, btCollisionObject colObj1) {
-            Gdx.app.log("OnContactAded",": contacts!");
-            super.onContactEnded(colObj0, colObj1);
+        public boolean onContactAdded(btCollisionObject colObj0, int partId0, int index0, btCollisionObject colObj1, int partId1, int index1) {
+            if (colObj0.userData.equals(cameraObject)) {
+                cameraObject.isGrounded = true;
+            } else if (colObj1.userData.equals(cameraObject)) {
+                cameraObject.isGrounded = true;
+            }
+            Gdx.app.log("OnContactAded", ": contacts!");
+            return true;
         }
     }
     static class MyMotionState extends btMotionState{
@@ -65,11 +75,11 @@ public class BulletTestScreen implements Screen {
         }
         public void update(float delta){
             if(!isGrounded){
-                rigidBody.setWorldTransform(rigidBody.getWorldTransform().translate(0,-9f*delta,0));
+                //rigidBody.setWorldTransform(rigidBody.getWorldTransform().translate(0,-9f*delta,0));
             }
-
         }
     }
+
     final GdxGame gdxGame;
     Array<GameObject> gameObjects;
     DebugDrawer debugDrawer;
@@ -95,7 +105,7 @@ public class BulletTestScreen implements Screen {
         Bullet.init();
         gameObjects = new Array<>();
         camera = new PerspectiveCamera(80,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
-        camera.position.set(new Vector3(19,12.5f,6));
+        camera.position.set(new Vector3(15 ,10,0));
         cameraInputController = new CameraInputController(camera);
 
         initBullet();
@@ -112,11 +122,13 @@ public class BulletTestScreen implements Screen {
         broadphase = new btDbvtBroadphase();
         constraintSolver = new btSequentialImpulseConstraintSolver();
         dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher,broadphase,constraintSolver,collisionConfig);
-        dynamicsWorld.setGravity(new Vector3(0,-5f,0));
-        contactListener = new MyContactListener();
+        dynamicsWorld.setGravity(new Vector3(0,-9f,0));
+
         debugDrawer = new DebugDrawer();
         debugDrawer.setDebugMode(btIDebugDraw.DebugDrawModes.DBG_MAX_DEBUG_DRAW_MODE);
         dynamicsWorld.setDebugDrawer(debugDrawer);
+        contactListener = new MyContactListener();
+        contactListener.enable();
         createObjects();
     }
     private void createObjects(){
@@ -129,9 +141,10 @@ public class BulletTestScreen implements Screen {
         GameObject gameObject = new GameObject(constructionInfo);
         gameObject.rigidBody.setCollisionFlags(btCollisionObject.CollisionFlags.CF_STATIC_OBJECT);
         gameObject.rigidBody.setActivationState(Collision.DISABLE_DEACTIVATION);
-        dynamicsWorld.addRigidBody(gameObject.rigidBody);
+        dynamicsWorld.addRigidBody(gameObject.rigidBody, GROUND_FLAG ,ALL_FLAG);
         gameObjects.add(gameObject);
 
+        // Player init
         btCapsuleShape capsuleShape = new btCapsuleShape(0.5f,3f);
         localInertia = new Vector3();
         mass = 4f;
@@ -139,12 +152,13 @@ public class BulletTestScreen implements Screen {
             capsuleShape.calculateLocalInertia(mass,localInertia);
         constructionInfo = new btRigidBody.btRigidBodyConstructionInfo(mass,null,capsuleShape,localInertia);
         gameObject = new GameObject(constructionInfo);
-        gameObject.rigidBody.setCollisionFlags(btCollisionObject.CollisionFlags.CF_KINEMATIC_OBJECT);
+        //gameObject.rigidBody.setCollisionFlags(btCollisionObject.CollisionFlags.CF_KINEMATIC_OBJECT);
         gameObject.rigidBody.setActivationState(Collision.DISABLE_DEACTIVATION);
         gameObject.rigidBody.setWorldTransform(new Matrix4().setTranslation(0,10,0));
-        dynamicsWorld.addRigidBody(gameObject.rigidBody);
+        dynamicsWorld.addRigidBody(gameObject.rigidBody, OBJECT_FLAG,ALL_FLAG);
         gameObjects.add(gameObject);
         cameraObject = gameObject;
+        cameraObject.rigidBody.userData = cameraObject;
 
     }
 
@@ -156,7 +170,7 @@ public class BulletTestScreen implements Screen {
     @Override
     public void render(float delta) {
         cameraObject.update(delta);
-        dynamicsWorld.stepSimulation(delta,5,1/60f);
+        dynamicsWorld.stepSimulation(delta, 5, 1 / 60f);
         camera.lookAt(cameraObject.rigidBody.getWorldTransform().getTranslation(new Vector3()));
         camera.update();
         Gdx.gl.glClearColor(0.05f, 0.05f, 0.05f, 1);
