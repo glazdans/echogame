@@ -34,7 +34,7 @@ public class GameObject {
         }
 
         if(!isGrounded){
-            rigidBody.setWorldTransform(transform.translate(0,-1*delta,0));
+            rigidBody.setWorldTransform(transform.translate(0,-9*delta,0));
         }
 
     }
@@ -46,7 +46,7 @@ public class GameObject {
     public btCollisionObject rayTest(btCollisionWorld collisionWorld) {
         rayFrom.set(rigidBody.getWorldTransform().getTranslation(new Vector3()));
         // 50 meters max from the origin
-        rayTo.set(rigidBody.getWorldTransform().getTranslation(new Vector3()).add(new Vector3(0, -1, 0)));
+        rayTo.set(rigidBody.getWorldTransform().getTranslation(new Vector3()).add(new Vector3(0, -3/2f-0.5f, 0)));
 
         // we reuse the ClosestRayResultCallback, thus we need to reset its
         // values
@@ -58,7 +58,7 @@ public class GameObject {
         collisionWorld.rayTest(rayFrom, rayTo, callback);
 
         if (callback.hasHit()) {
-            Gdx.app.log("GameObject rayTest ","callback");
+            //Gdx.app.log("GameObject rayTest ","callback");
             return callback.getCollisionObject();
         }
 
