@@ -5,12 +5,13 @@ import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.math.Vector3;
 import com.glazdans.echo.bullet.BulletTestScreen;
+import com.glazdans.echo.bullet.GameObject;
 
 public class PlayerController extends InputAdapter{
-    BulletTestScreen.GameObject gameObject;
+    GameObject gameObject;
     Camera camera;
 
-    public PlayerController(BulletTestScreen.GameObject gameObject, Camera camera) {
+    public PlayerController(GameObject gameObject, Camera camera) {
         this.gameObject = gameObject;
         this.camera = camera;
     }

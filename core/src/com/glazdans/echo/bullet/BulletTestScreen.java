@@ -56,30 +56,6 @@ public class BulletTestScreen implements Screen {
         }
     }
 
-    public static class GameObject implements Disposable{
-        public btRigidBody rigidBody;
-        public boolean isGrounded;
-        public MyMotionState motionState;
-        public Matrix4 transform;
-
-        @Override
-        public void dispose() {
-            rigidBody.dispose();
-        }
-
-        public GameObject(btRigidBody.btRigidBodyConstructionInfo constructionInfo) {
-            rigidBody = new btRigidBody(constructionInfo);
-            //motionState = new MyMotionState();
-            //motionState.transform = transform;
-            //rigidBody.setMotionState(motionState);
-        }
-        public void update(float delta){
-            if(!isGrounded){
-                //rigidBody.setWorldTransform(rigidBody.getWorldTransform().translate(0,-9f*delta,0));
-            }
-        }
-    }
-
     final GdxGame gdxGame;
     Array<GameObject> gameObjects;
     DebugDrawer debugDrawer;
@@ -152,7 +128,7 @@ public class BulletTestScreen implements Screen {
             capsuleShape.calculateLocalInertia(mass,localInertia);
         constructionInfo = new btRigidBody.btRigidBodyConstructionInfo(mass,null,capsuleShape,localInertia);
         gameObject = new GameObject(constructionInfo);
-        //gameObject.rigidBody.setCollisionFlags(btCollisionObject.CollisionFlags.CF_KINEMATIC_OBJECT);
+        gameObject.rigidBody.setCollisionFlags(btCollisionObject.CollisionFlags.CF_KINEMATIC_OBJECT);
         gameObject.rigidBody.setActivationState(Collision.DISABLE_DEACTIVATION);
         gameObject.rigidBody.setWorldTransform(new Matrix4().setTranslation(0,10,0));
         dynamicsWorld.addRigidBody(gameObject.rigidBody, OBJECT_FLAG,ALL_FLAG);
@@ -169,7 +145,7 @@ public class BulletTestScreen implements Screen {
 
     @Override
     public void render(float delta) {
-        cameraObject.update(delta);
+        cameraObject.update(delta,dynamicsWorld);
         dynamicsWorld.stepSimulation(delta, 5, 1 / 60f);
         camera.lookAt(cameraObject.rigidBody.getWorldTransform().getTranslation(new Vector3()));
         camera.update();
