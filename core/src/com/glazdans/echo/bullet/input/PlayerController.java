@@ -15,19 +15,65 @@ public class PlayerController extends InputAdapter{
         this.gameObject = gameObject;
         this.camera = camera;
     }
+
+    private boolean pressUp;
+    private boolean pressDown;
+    private boolean pressLeft;
+    private boolean pressRight;
+
+    public void updateMovement(){
+        if(pressUp){
+            tmp.add(0,0,1);
+        }
+        if(pressDown){
+            tmp.add(0,0,-1);
+        }
+        if(pressLeft){
+            tmp.add(1,0,0);
+        }
+        if(pressRight){
+            tmp.add(-1,0,0);
+        }
+        gameObject.updateAcceleration(tmp);
+        tmp.set(0,0,0);
+    }
+
     private static Vector3 tmp = new Vector3();
     @Override
     public boolean keyDown(int keycode) {
         switch (keycode){
             case Input.Keys.W:
-                tmp.set(camera.direction);
-                gameObject.rigidBody.applyCentralForce(tmp.scl(100f));
+                pressUp = true;
+                //tmp.set(camera.direction);
                 break;
             case Input.Keys.A:
+                pressLeft = true;
                 break;
             case Input.Keys.S:
+                pressDown = true;
                 break;
             case Input.Keys.D:
+                pressRight = true;
+                break;
+
+        }
+        return false;
+    }
+
+    @Override
+    public boolean keyUp(int keycode) {
+        switch (keycode){
+            case Input.Keys.W:
+                pressUp = false;
+                break;
+            case Input.Keys.A:
+                pressLeft = false;
+                break;
+            case Input.Keys.S:
+                pressDown = false;
+                break;
+            case Input.Keys.D:
+                pressRight = false;
                 break;
 
         }

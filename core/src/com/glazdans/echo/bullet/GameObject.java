@@ -12,20 +12,42 @@ import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 public class GameObject {
     public btRigidBody rigidBody;
     public Matrix4 transform;
-    public BulletTestScreen.MyMotionState motionState;
 
+    public Vector3 acceleration;
+    public Vector3 velocity;
+
+    private float movementSpeed = 50;
     public boolean isGrounded;
 
-    public GameObject(btRigidBody.btRigidBodyConstructionInfo constructionInfo) {
+    final boolean isDynamic;
+
+    private Vector3 collisionPositionChanges;
+    int collisionPositionChangeCount;
+
+
+    public GameObject(btRigidBody.btRigidBodyConstructionInfo constructionInfo, boolean isDynamic) {
         rigidBody = new btRigidBody(constructionInfo);
-        //motionState = new MyMotionState();
-        //motionState.transform = transform;
-        //rigidBody.setMotionState(motionState);
         transform = new Matrix4(rigidBody.getWorldTransform());
-        transform.translate(0,15f,0);
+        transform.translate(0,10f,0);
+        acceleration = new Vector3();
+        velocity = new Vector3();
+        collisionPositionChanges = new Vector3();
+        this.isDynamic = isDynamic;
     }
 
-    public void update(float delta,btDynamicsWorld world){
+    public void addCollisionPositionChange(Vector3 posDelta) {
+        collisionPositionChangeCount++;
+        collisionPositionChanges.add(posDelta);
+    }
+
+    public void updateAcceleration(Vector3 direction){
+        direction.nor();
+        acceleration.set(direction.scl(movementSpeed));
+    }
+    private static Vector3 tmp = new Vector3();
+    public void update(float delta,btCollisionWorld world){
+        handleCollisions();
+
         btCollisionObject  collisionObject = rayTest(world);
         if(collisionObject != null) {
             isGrounded = true;
@@ -34,9 +56,34 @@ public class GameObject {
         }
 
         if(!isGrounded){
-            rigidBody.setWorldTransform(transform.translate(0,-9*delta,0));
+            acceleration.add(0, -18, 0);
+        }else{
+            acceleration.y = 0;
+            velocity.y = 0;
         }
 
+        tmp.set(acceleration);
+        tmp.scl(delta);
+        velocity.add(tmp);
+        tmp.set(velocity);
+        tmp.scl(delta);
+        velocity = velocity.scl(0.95f);
+        rigidBody.setWorldTransform(transform.translate(tmp));
+
+    }
+
+    public void handleCollisions() {
+        if (collisionPositionChangeCount > 0) {
+            collisionPositionChanges.scl(1f / collisionPositionChangeCount);
+            collisionPositionChanges.scl(-1f); // subtraction
+            adjustPosition(collisionPositionChanges);
+            collisionPositionChangeCount = 0;
+            collisionPositionChanges.setZero();
+        }
+    }
+
+    private void adjustPosition(Vector3 change){
+        transform.translate(change);
     }
 
     private static final Vector3 rayFrom = new Vector3();
@@ -46,7 +93,7 @@ public class GameObject {
     public btCollisionObject rayTest(btCollisionWorld collisionWorld) {
         rayFrom.set(rigidBody.getWorldTransform().getTranslation(new Vector3()));
         // 50 meters max from the origin
-        rayTo.set(rigidBody.getWorldTransform().getTranslation(new Vector3()).add(new Vector3(0, -3/2f-0.5f, 0)));
+        rayTo.set(rigidBody.getWorldTransform().getTranslation(new Vector3()).add(new Vector3(0, -3/2f-0.5f, 0))); // -3/2f-0.5f
 
         // we reuse the ClosestRayResultCallback, thus we need to reset its
         // values
