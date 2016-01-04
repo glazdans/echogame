@@ -139,12 +139,14 @@ public class BulletTestScreen implements Screen {
     private PerspectiveCamera camera;
     CameraInputController cameraInputController;
 
+    private float cameraHeight = 18;
+
     public BulletTestScreen(GdxGame game){
         this.gdxGame = game;
         Bullet.init();
         gameObjects = new Array<>();
-        camera = new PerspectiveCamera(80,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
-        camera.position.set(new Vector3(0 ,15,-1));
+        camera = new PerspectiveCamera(60,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+        camera.position.set(new Vector3(0 ,35,-1));
         camera.lookAt(0,0,0);
         cameraInputController = new CameraInputController(camera);
 
@@ -234,6 +236,8 @@ public class BulletTestScreen implements Screen {
     }
     float minFrameRate = 1/30f;
 
+    private static Vector3 cameraVector = new Vector3();
+
     @Override
     public void render(float delta) {
         if(delta>minFrameRate){
@@ -243,13 +247,23 @@ public class BulletTestScreen implements Screen {
         collisionWorld.performDiscreteCollisionDetection();
         cameraObject.update(delta,collisionWorld);
         Vector3 cameraObjectVector = cameraObject.transform.getTranslation(new Vector3());
-        camera.position.set(cameraObjectVector.x,10,cameraObjectVector.z);
+        camera.position.set(cameraObjectVector.x,cameraHeight,cameraObjectVector.z);
         camera.update();
+        cameraVector.set(Gdx.input.getX(),Gdx.input.getY(),0);
+        cameraVector = camera.unproject(cameraVector);
+        cameraObject.setRotation(cameraVector.dot(cameraObject.transform.getTranslation(new Vector3())));
+        //cameraObject.transform.setToLookAt(cameraVector.sub(cameraObject.transform.getTranslation(new Vector3())),Vector3.X);
         Gdx.gl.glClearColor(0.05f, 0.05f, 0.05f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
             new Boolean("false");
+        }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.PLUS)){
+            cameraHeight--;
+        }
+        if(Gdx.input.isKeyJustPressed(Input.Keys.MINUS)){
+            cameraHeight++;
         }
         if(Gdx.input.isKeyJustPressed(Input.Keys.R)){
             gdxGame.setScreen(new BulletTestScreen(gdxGame));

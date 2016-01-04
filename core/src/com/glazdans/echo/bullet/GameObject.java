@@ -2,6 +2,7 @@ package com.glazdans.echo.bullet;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
@@ -12,6 +13,9 @@ import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 public class GameObject {
     public btRigidBody rigidBody;
     public Matrix4 transform;
+
+    public Quaternion rotation;
+    public Vector3 position;
 
     public Vector3 acceleration;
     public Vector3 velocity;
@@ -26,6 +30,7 @@ public class GameObject {
 
 
     public GameObject(btRigidBody.btRigidBodyConstructionInfo constructionInfo, boolean isDynamic) {
+
         rigidBody = new btRigidBody(constructionInfo);
         transform = new Matrix4(rigidBody.getWorldTransform());
         transform.translate(0,10f,0);
@@ -33,6 +38,11 @@ public class GameObject {
         velocity = new Vector3();
         collisionPositionChanges = new Vector3();
         this.isDynamic = isDynamic;
+        transform.rotate(Vector3.Y,20);
+
+        position = new Vector3();
+        rotation = new Quaternion();
+        position.y = 20;
     }
 
     public void addCollisionPositionChange(Vector3 posDelta) {
@@ -43,6 +53,9 @@ public class GameObject {
     public void updateAcceleration(Vector3 direction){
         direction.nor();
         acceleration.set(direction.scl(movementSpeed));
+    }
+    public void setRotation(float angleY){
+        //rotation.setEulerAngles(0,angleY,0);
     }
     private static Vector3 tmp = new Vector3();
     public void update(float delta,btCollisionWorld world){
@@ -60,6 +73,7 @@ public class GameObject {
         }else{
             acceleration.y = 0;
             velocity.y = 0;
+            position.y = 0;
         }
 
         tmp.set(acceleration);
@@ -68,7 +82,9 @@ public class GameObject {
         tmp.set(velocity);
         tmp.scl(delta);
         velocity = velocity.scl(0.95f);
-        rigidBody.setWorldTransform(transform.translate(tmp));
+        position.add(velocity);
+        transform.set(position,rotation);
+        rigidBody.setWorldTransform(transform);
 
     }
 
@@ -83,7 +99,8 @@ public class GameObject {
     }
 
     private void adjustPosition(Vector3 change){
-        transform.translate(change);
+        //transform.translate(change);
+        position.add(change);
     }
 
     private static final Vector3 rayFrom = new Vector3();
