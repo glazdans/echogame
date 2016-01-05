@@ -7,7 +7,6 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
@@ -17,7 +16,6 @@ import com.badlogic.gdx.physics.bullet.dynamics.*;
 import com.badlogic.gdx.physics.bullet.linearmath.btIDebugDraw;
 import com.badlogic.gdx.physics.bullet.linearmath.btMotionState;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Disposable;
 import com.glazdans.echo.GdxGame;
 import com.glazdans.echo.bullet.input.PlayerController;
 
@@ -35,11 +33,16 @@ public class BulletTestScreen implements Screen {
     private static Vector3 tmp4 = new Vector3();
     private static Vector3 tmp5 = new Vector3();
 
+    public static Array<Projectile> projectiles = new Array<>();
+
     class MyContactListener extends ContactListener {
         @Override
         public boolean onContactAdded(btManifoldPoint cp, btCollisionObject colObj0, int partId0, int index0, btCollisionObject colObj1, int partId1, int index1) {
             GameObject a = getEntity(colObj0);
             GameObject b = getEntity(colObj1);
+            if(a == null || b == null){
+               return false;
+            }
             if (a != null || b != null) {
                 // the distance between the point on body A that collided and the point on body B that collided
                 float dist = cp.getDistance();
@@ -106,6 +109,7 @@ public class BulletTestScreen implements Screen {
         vec.sub(tmp2);
     }
 
+    @Deprecated // USELESS CODE - DELETE
     static class MyMotionState extends btMotionState{
         Matrix4 transform;
 
@@ -129,7 +133,7 @@ public class BulletTestScreen implements Screen {
     MyContactListener contactListener;
     btBroadphaseInterface broadphase;
 
-    private btCollisionWorld collisionWorld;
+    public static btCollisionWorld collisionWorld;
 
     GameObject cameraObject;
     PlayerController playerController;
@@ -137,7 +141,6 @@ public class BulletTestScreen implements Screen {
 
 
     private PerspectiveCamera camera;
-    CameraInputController cameraInputController;
 
     private float cameraHeight = 18;
 
@@ -148,12 +151,10 @@ public class BulletTestScreen implements Screen {
         camera = new PerspectiveCamera(60,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         camera.position.set(new Vector3(0 ,35,-1));
         camera.lookAt(0,0,0);
-        cameraInputController = new CameraInputController(camera);
 
         initBullet();
         playerController = new PlayerController(cameraObject,camera);
         inputMultiplexer = new InputMultiplexer();
-        inputMultiplexer.addProcessor(cameraInputController);
         inputMultiplexer.addProcessor(playerController);
         Gdx.input.setInputProcessor(inputMultiplexer);
     }
@@ -236,23 +237,26 @@ public class BulletTestScreen implements Screen {
     }
     float minFrameRate = 1/30f;
 
-    private static Vector3 cameraVector = new Vector3();
-
     @Override
     public void render(float delta) {
         if(delta>minFrameRate){
             delta = minFrameRate;
         }
-        playerController.updateMovement();
+        playerController.updateMovement(collisionWorld);
+
+        for (Projectile projectile : projectiles) {
+            projectile.update(delta);
+        }
         collisionWorld.performDiscreteCollisionDetection();
         cameraObject.update(delta,collisionWorld);
+
         Vector3 cameraObjectVector = cameraObject.transform.getTranslation(new Vector3());
         camera.position.set(cameraObjectVector.x,cameraHeight,cameraObjectVector.z);
+        camera.lookAt(cameraObject.position);
         camera.update();
-        cameraVector.set(Gdx.input.getX(),Gdx.input.getY(),0);
-        cameraVector = camera.unproject(cameraVector);
-        cameraObject.setRotation(cameraVector.dot(cameraObject.transform.getTranslation(new Vector3())));
-        //cameraObject.transform.setToLookAt(cameraVector.sub(cameraObject.transform.getTranslation(new Vector3())),Vector3.X);
+
+
+
         Gdx.gl.glClearColor(0.05f, 0.05f, 0.05f, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 

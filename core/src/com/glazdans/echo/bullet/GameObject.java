@@ -1,13 +1,11 @@
 package com.glazdans.echo.bullet;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionWorld;
-import com.badlogic.gdx.physics.bullet.dynamics.btDynamicsWorld;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 
 public class GameObject {
@@ -30,19 +28,16 @@ public class GameObject {
 
 
     public GameObject(btRigidBody.btRigidBodyConstructionInfo constructionInfo, boolean isDynamic) {
-
         rigidBody = new btRigidBody(constructionInfo);
         transform = new Matrix4(rigidBody.getWorldTransform());
-        transform.translate(0,10f,0);
         acceleration = new Vector3();
         velocity = new Vector3();
         collisionPositionChanges = new Vector3();
         this.isDynamic = isDynamic;
-        transform.rotate(Vector3.Y,20);
 
         position = new Vector3();
         rotation = new Quaternion();
-        position.y = 20;
+        position.y = 15;
     }
 
     public void addCollisionPositionChange(Vector3 posDelta) {
@@ -55,7 +50,7 @@ public class GameObject {
         acceleration.set(direction.scl(movementSpeed));
     }
     public void setRotation(float angleY){
-        //rotation.setEulerAngles(0,angleY,0);
+        rotation.setEulerAngles(angleY,0,0);
     }
     private static Vector3 tmp = new Vector3();
     public void update(float delta,btCollisionWorld world){
@@ -72,8 +67,6 @@ public class GameObject {
             acceleration.add(0, -18, 0);
         }else{
             acceleration.y = 0;
-            velocity.y = 0;
-            position.y = 0;
         }
 
         tmp.set(acceleration);
@@ -82,10 +75,21 @@ public class GameObject {
         tmp.set(velocity);
         tmp.scl(delta);
         velocity = velocity.scl(0.95f);
-        position.add(velocity);
+        tmp.set(velocity);
+        tmp.scl(delta);
+        position.add(tmp);
         transform.set(position,rotation);
         rigidBody.setWorldTransform(transform);
 
+    }
+
+    public void shoot(){
+        Vector3 direction = new Vector3(0,0,1);
+        direction = direction.mul(rotation);
+        Vector3 startingPosition = new Vector3(direction);
+        startingPosition.scl(1f).add(position);
+        Projectile projectile = new Projectile(startingPosition,direction,21f,BulletTestScreen.collisionWorld);
+        BulletTestScreen.projectiles.add(projectile);
     }
 
     public void handleCollisions() {
@@ -99,7 +103,6 @@ public class GameObject {
     }
 
     private void adjustPosition(Vector3 change){
-        //transform.translate(change);
         position.add(change);
     }
 
