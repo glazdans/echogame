@@ -15,10 +15,12 @@ import com.glazdans.echo.bullet.GameObject;
 public class PlayerController extends InputAdapter{
     GameObject gameObject;
     Camera camera;
+    btCollisionWorld world;
 
-    public PlayerController(GameObject gameObject, Camera camera) {
+    public PlayerController(GameObject gameObject, Camera camera,btCollisionWorld world) {
         this.gameObject = gameObject;
         this.camera = camera;
+        this.world = world;
     }
 
     private boolean pressUp;
@@ -28,7 +30,7 @@ public class PlayerController extends InputAdapter{
 
     private boolean pressShoot;
 
-    public void updateMovement(btCollisionWorld world){
+    public void updateMovement(){
         if(pressUp){
             tmp.add(0,0,1);
         }
