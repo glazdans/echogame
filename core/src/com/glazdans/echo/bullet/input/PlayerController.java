@@ -54,7 +54,7 @@ public class PlayerController extends InputAdapter{
         tmp.set(0,0,0);
 
         if(pressShoot) {
-            gameObject.shoot();
+            //gameObject.shoot();
         }
     }
     private static final Vector2 cameraVector= new Vector2();
