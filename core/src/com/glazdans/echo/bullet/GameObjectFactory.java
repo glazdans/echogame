@@ -8,7 +8,7 @@ import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 import com.badlogic.gdx.utils.Array;
 
 public class GameObjectFactory {
-
+    // TODO remove rigid body info
     public static void createObjects(btCollisionWorld collisionWorld,Array<GameObject> gameObjects) {
         btBoxShape box = new btBoxShape(new Vector3(10, 1, 10));
         btCollisionShape ground = new btStaticPlaneShape(new Vector3(0, 1, 0), 1);
@@ -17,7 +17,7 @@ public class GameObjectFactory {
         if (mass > 0)
             box.calculateLocalInertia(mass, localInertia);
         btRigidBody.btRigidBodyConstructionInfo constructionInfo = new btRigidBody.btRigidBodyConstructionInfo(mass, null, box, localInertia);
-        GameObject gameObject = new GameObject(constructionInfo, false);
+        GameObject gameObject = new GameObject(box, false);
         gameObject.rigidBody.userData = gameObject;
         collisionWorld.addCollisionObject(gameObject.rigidBody); // TODO MAKE EVERYTHING COLLISION OBJECTS;
         gameObjects.add(gameObject);
@@ -29,7 +29,7 @@ public class GameObjectFactory {
         if (mass > 0)
             box.calculateLocalInertia(mass, localInertia);
         constructionInfo = new btRigidBody.btRigidBodyConstructionInfo(mass, null, wall, localInertia);
-        gameObject = new GameObject(constructionInfo, false);
+        gameObject = new GameObject(wall, false);
         gameObject.rigidBody.userData = gameObject;
         gameObject.rigidBody.setWorldTransform(new Matrix4().translate(0, 9, 11));
         collisionWorld.addCollisionObject(gameObject.rigidBody);
@@ -43,7 +43,7 @@ public class GameObjectFactory {
         if (mass > 0)
             box.calculateLocalInertia(mass, localInertia);
         constructionInfo = new btRigidBody.btRigidBodyConstructionInfo(mass, null, box, localInertia);
-        gameObject = new GameObject(constructionInfo, true);
+        gameObject = new GameObject(box, true);
         gameObject.rigidBody.userData = gameObject;
         gameObject.rigidBody.setWorldTransform(new Matrix4().translate(new Vector3(0, 5, 0)));
         collisionWorld.addCollisionObject(gameObject.rigidBody);
@@ -57,7 +57,7 @@ public class GameObjectFactory {
         if(mass >0)
             capsuleShape.calculateLocalInertia(mass,localInertia);
         btRigidBody.btRigidBodyConstructionInfo constructionInfo = new btRigidBody.btRigidBodyConstructionInfo(mass,null,capsuleShape,localInertia);
-        GameObject gameObject = new GameObject(constructionInfo,true);
+        GameObject gameObject = new GameObject(capsuleShape,true);
         gameObject.rigidBody.setActivationState(Collision.DISABLE_DEACTIVATION);
         gameObject.rigidBody.setWorldTransform(new Matrix4().setTranslation(0,5,0));
         gameObject.rigidBody.setCollisionFlags(btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);

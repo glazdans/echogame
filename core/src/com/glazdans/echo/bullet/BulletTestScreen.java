@@ -7,6 +7,8 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.g3d.model.Node;
+import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.Bullet;
@@ -22,45 +24,25 @@ import com.glazdans.echo.bullet.input.PlayerController;
 import java.util.ArrayList;
 
 public class BulletTestScreen implements Screen {
-
-    final static short GROUND_FLAG = 1<<8;
-    final static short OBJECT_FLAG = 1<<9;
-    final static short ALL_FLAG = -1;
-
     public static Array<Projectile> projectiles = new Array<>();
     public static Array<GameObject> gameObjects = new Array<>();
-
-
-    @Deprecated // USELESS CODE - DELETE
-    static class MyMotionState extends btMotionState{
-        Matrix4 transform;
-
-        @Override
-        public void getWorldTransform(Matrix4 worldTrans) {
-            worldTrans.set(transform);
-        }
-
-        @Override
-        public void setWorldTransform(Matrix4 worldTrans) {
-            transform.set(worldTrans);
-        }
-    }
 
     final GdxGame gdxGame;
 
     DebugDrawer debugDrawer;
 
-
     GameObject cameraObject;
     PlayerController playerController;
+    CameraInputController cameraInputController;
     InputMultiplexer inputMultiplexer;
 
     Physics physics;
 
-
     private PerspectiveCamera camera;
 
     private float cameraHeight = 18;
+
+    ModelLoader modelLoader;
 
     public BulletTestScreen(GdxGame game){
         this.gdxGame = game;
@@ -71,14 +53,29 @@ public class BulletTestScreen implements Screen {
         physics.setDebugDrawer(debugDrawer);
 
         camera = new PerspectiveCamera(60,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
-        camera.position.set(new Vector3(0 ,35,-1));
+        camera.position.set(new Vector3(0 ,35,-5));
         camera.lookAt(0,0,0);
+        camera.far=100000000;
 
         cameraObject = GameObjectFactory.getPlayer(physics.collisionWorld,gameObjects);
         playerController = new PlayerController(cameraObject,camera,physics.collisionWorld);
         inputMultiplexer = new InputMultiplexer();
+        cameraInputController = new CameraInputController(camera);
         inputMultiplexer.addProcessor(playerController);
+        inputMultiplexer.addProcessor(cameraInputController);
         Gdx.input.setInputProcessor(inputMultiplexer);
+        modelLoader = new ModelLoader();
+        Array<Node> modelNodes = modelLoader.loadModel().nodes;
+        for (Node modelNode : modelNodes) {
+            btCollisionShape shape = Bullet.obtainStaticNodeShape(modelNode,true);
+            GameObject gameObject = new GameObject(shape,false);
+            gameObject.rigidBody.userData = gameObject;
+
+            physics.collisionWorld.addCollisionObject(gameObject.rigidBody);
+            gameObjects.add(gameObject);
+        }
+
+
     }
 
     @Override
@@ -101,8 +98,8 @@ public class BulletTestScreen implements Screen {
         cameraObject.update(delta,physics.collisionWorld);
 
         Vector3 cameraObjectVector = cameraObject.transform.getTranslation(new Vector3());
-        camera.position.set(cameraObjectVector.x,cameraHeight,cameraObjectVector.z);
-        camera.lookAt(cameraObject.position);
+        //camera.position.set(cameraObjectVector.x,cameraHeight,cameraObjectVector.z-3);
+        //camera.lookAt(cameraObject.position);
         camera.update();
 
 
@@ -111,12 +108,14 @@ public class BulletTestScreen implements Screen {
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
             new Boolean("false");
+            cameraObject.position.y = 10;
+            cameraObject.velocity.y = 0;
         }
         if(Gdx.input.isKeyJustPressed(Input.Keys.PLUS)){
-            cameraHeight--;
+            cameraHeight-=10;
         }
         if(Gdx.input.isKeyJustPressed(Input.Keys.MINUS)){
-            cameraHeight++;
+            cameraHeight+=10;
         }
         if(Gdx.input.isKeyJustPressed(Input.Keys.R)){
             gdxGame.setScreen(new BulletTestScreen(gdxGame));

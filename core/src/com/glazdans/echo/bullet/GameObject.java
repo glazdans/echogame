@@ -1,15 +1,18 @@
 package com.glazdans.echo.bullet;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionWorld;
 import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 
 public class GameObject {
-    public btRigidBody rigidBody;
+    public btCollisionObject rigidBody;
     public Matrix4 transform;
 
     public Quaternion rotation;
@@ -18,8 +21,10 @@ public class GameObject {
     public Vector3 acceleration;
     public Vector3 velocity;
 
-    private float movementSpeed = 50;
+    private float movementSpeed = 150;
+    private float maxMovementSpeed= 10f;
     public boolean isGrounded;
+    float distanceFromGround;
 
     final boolean isDynamic;
 
@@ -27,8 +32,9 @@ public class GameObject {
     int collisionPositionChangeCount;
 
 
-    public GameObject(btRigidBody.btRigidBodyConstructionInfo constructionInfo, boolean isDynamic) {
-        rigidBody = new btRigidBody(constructionInfo);
+    public GameObject(btCollisionShape collisionShape, boolean isDynamic) {
+        rigidBody = new btCollisionObject();
+        rigidBody.setCollisionShape(collisionShape);
         transform = new Matrix4(rigidBody.getWorldTransform());
         acceleration = new Vector3();
         velocity = new Vector3();
@@ -37,7 +43,7 @@ public class GameObject {
 
         position = new Vector3();
         rotation = new Quaternion();
-        position.y = 15;
+        position.y = 10;
     }
 
     public void addCollisionPositionChange(Vector3 posDelta) {
@@ -53,10 +59,42 @@ public class GameObject {
         rotation.setEulerAngles(angleY,0,0);
     }
     private static Vector3 tmp = new Vector3();
+    private static Vector2 directionVector = new Vector2();
     public void update(float delta,btCollisionWorld world){
-        handleCollisions();
+        handleCollisions(); // TODO HANDLE GROUND MOVEMENT :)
 
-        btCollisionObject  collisionObject = rayTest(world);
+        distanceFromGround = Physics.getInstance().distanceFromGroundFast(position,new Vector3(0,-5,0));
+        int groundRayHits = 0;
+        float avgDist = Physics.lastDistanceFromGroundAvgDist;
+        // when the ray went the full length and did not hit the ground, NaN is the return value
+        isGrounded = false;
+        float embedThreshold = 0f;
+        if (!Float.isNaN(distanceFromGround)) {
+            Vector3 vel = velocity;
+            if (distanceFromGround < 0.1f) {
+                adjustPosition(tmp.set(0f, -distanceFromGround, 0f));
+                if (vel.y < 0f) vel.y = 0f;
+                isGrounded = true;
+            }
+            if (distanceFromGround < embedThreshold && groundRayHits == 4 && avgDist <= 0f) {
+                // penetrating into the ground
+                position.y += -distanceFromGround;
+            } else if (distanceFromGround > 0f) {
+                Vector3 velocity = this.velocity;
+                // cap velocity to distance from ground
+                if (velocity.y < 0 && distanceFromGround - velocity.y <= 0f) {
+                    velocity.y = -distanceFromGround;
+                    System.out.println("cap velocity: " + velocity.y);
+                }
+            }
+        }
+        if(!isGrounded){
+            acceleration.add(0, -9.81f, 0);
+        }else{
+            acceleration.y = 0;
+        }
+
+     /*   btCollisionObject  collisionObject = rayTest(world);
         if(collisionObject != null) {
             isGrounded = true;
         } else {
@@ -64,17 +102,26 @@ public class GameObject {
         }
 
         if(!isGrounded){
-            acceleration.add(0, -18, 0);
+            acceleration.add(0, -9.81f, 0);
         }else{
             acceleration.y = 0;
         }
+        Gdx.app.log("IsGrounded",Boolean.toString(isGrounded));*/
+        Gdx.app.log("IsGrounded",Boolean.toString(isGrounded));
+
+        Gdx.app.log("DistanceFromGround",Float.toString(distanceFromGround));
 
         tmp.set(acceleration);
         tmp.scl(delta);
         velocity.add(tmp);
         tmp.set(velocity);
-        tmp.scl(delta);
-        velocity = velocity.scl(0.95f);
+        velocity = velocity.scl(0.80f);
+        velocity.set(velocity.x,tmp.y,velocity.z);
+        directionVector.set(velocity.x,velocity.z);
+        if(directionVector.len2() > maxMovementSpeed*maxMovementSpeed){
+            directionVector.nor().scl(maxMovementSpeed);
+            velocity.set(directionVector.x,velocity.y,directionVector.y);
+        }
         tmp.set(velocity);
         tmp.scl(delta);
         position.add(tmp);
@@ -96,7 +143,7 @@ public class GameObject {
         if (collisionPositionChangeCount > 0) {
             collisionPositionChanges.scl(1f / collisionPositionChangeCount);
             collisionPositionChanges.scl(-1f); // subtraction
-            adjustPosition(collisionPositionChanges);
+            adjustPosition(collisionPositionChanges.scl(1.3f));
             collisionPositionChangeCount = 0;
             collisionPositionChanges.setZero();
         }
