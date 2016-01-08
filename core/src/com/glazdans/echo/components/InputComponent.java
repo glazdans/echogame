@@ -8,4 +8,5 @@ public class InputComponent extends Component {
     public boolean pressLeft;
     public boolean pressRight;
     public boolean pressShoot;
+    public boolean fak;
 }
