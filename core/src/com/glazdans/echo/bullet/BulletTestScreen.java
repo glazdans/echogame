@@ -55,16 +55,9 @@ public class BulletTestScreen implements Screen {
         camera = new PerspectiveCamera(60,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
         camera.position.set(new Vector3(0 ,35,-5));
         camera.lookAt(0,0,0);
-        camera.far=100000000;
 
         //GameObjectFactory.createObjects(BulletTestScreen.gameObjects);
-        cameraObject = GameObjectFactory.getPlayer(gameObjects);
-        playerController = new PlayerController(cameraObject,camera,physics.collisionWorld);
-        inputMultiplexer = new InputMultiplexer();
-        cameraInputController = new CameraInputController(camera);
-        inputMultiplexer.addProcessor(playerController);
-        inputMultiplexer.addProcessor(cameraInputController);
-        Gdx.input.setInputProcessor(inputMultiplexer);
+
         modelLoader = new ModelLoader();
         Array<Node> modelNodes = modelLoader.loadModel().nodes;
         for (Node modelNode : modelNodes) {
@@ -76,7 +69,13 @@ public class BulletTestScreen implements Screen {
             gameObjects.add(gameObject);
         }
 
-
+        cameraObject = GameObjectFactory.getPlayer(gameObjects);
+        playerController = new PlayerController(cameraObject,camera,physics.collisionWorld);
+        inputMultiplexer = new InputMultiplexer();
+        cameraInputController = new CameraInputController(camera);
+        inputMultiplexer.addProcessor(playerController);
+        inputMultiplexer.addProcessor(cameraInputController);
+        Gdx.input.setInputProcessor(inputMultiplexer);
     }
 
     @Override

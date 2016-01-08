@@ -11,6 +11,7 @@ import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionWorld;
 import com.glazdans.echo.bullet.BulletTestScreen;
 import com.glazdans.echo.bullet.GameObject;
+import com.glazdans.echo.bullet.Physics;
 
 public class PlayerController extends InputAdapter{
     GameObject gameObject;
@@ -49,7 +50,8 @@ public class PlayerController extends InputAdapter{
         Vector3 floor = floorPosition(world);
         floor = floor.sub(gameObject.position);
         cameraVector.set(floor.x,floor.z);
-        gameObject.setRotation(-cameraVector.angle()+90);
+        float angle = -cameraVector.angle()+90;
+        gameObject.setRotation(angle);
 
         tmp.set(0,0,0);
 
@@ -67,10 +69,13 @@ public class PlayerController extends InputAdapter{
         callback.setClosestHitFraction(10);
         callback.setRayFromWorld(cameraRay.origin);
         callback.setRayToWorld(cameraRay.getEndPoint(new Vector3(),50));
+        callback.setCollisionFilterGroup(Physics.OBJECT_FLAG);
+        callback.setCollisionFilterMask(Physics.ALL_FLAG);
+
 
         collisionWorld.rayTest(cameraRay.origin,cameraRay.getEndPoint(new Vector3(),50),callback);
 
-        Vector3 returnVector = tmp;
+        Vector3 returnVector = tmp1;
         callback.getHitPointWorld(returnVector);
         return returnVector;
 

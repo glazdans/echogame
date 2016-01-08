@@ -16,9 +16,9 @@ public class Physics implements Disposable {
     private static Vector3 tmp2 = new Vector3();
     private static Vector3 tmp3 = new Vector3();
 
-    final static short GROUND_FLAG = 1<<8;
-    final static short OBJECT_FLAG = 1<<9;
-    final static short ALL_FLAG = -1;
+    public final static short GROUND_FLAG = 1<<8;
+    public final static short OBJECT_FLAG = 1<<9;
+    public final static short ALL_FLAG = -1;
 
     private MyContactListener contactListener;
 

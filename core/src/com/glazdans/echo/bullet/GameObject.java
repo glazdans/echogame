@@ -114,8 +114,8 @@ public class GameObject {
         }else{
             acceleration.y = 0;
         }
-        Gdx.app.log("IsGrounded",Boolean.toString(isGrounded));*//*
-        Gdx.app.log("IsGrounded",Boolean.toString(isGrounded));
+        Gdx.app.log("IsGrounded",Boolean.toString(isGrounded));*/
+        /*Gdx.app.log("IsGrounded",Boolean.toString(isGrounded));
         Gdx.app.log("DistanceFromGround",Float.toString(distanceFromGround));*/
 
         tmp.set(acceleration);
