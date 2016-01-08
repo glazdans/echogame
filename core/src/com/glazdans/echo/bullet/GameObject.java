@@ -10,7 +10,6 @@ import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionWorld;
-import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
 
 public class GameObject {
     public btCollisionObject rigidBody;
@@ -22,7 +21,7 @@ public class GameObject {
     public Vector3 acceleration;
     public Vector3 velocity;
 
-    private float movementSpeed = 150;
+    private float movementSpeed = 350;
     private float maxMovementSpeed= 10f;
     public boolean isGrounded;
     float distanceFromGround;
@@ -118,7 +117,7 @@ public class GameObject {
         /*Gdx.app.log("IsGrounded",Boolean.toString(isGrounded));
         Gdx.app.log("DistanceFromGround",Float.toString(distanceFromGround));*/
 
-        tmp.set(acceleration);
+        tmp.set(acceleration); //TODO IN MOVEMENT SYSTEM - delete this
         tmp.scl(delta);
         velocity.add(tmp);
         tmp.set(velocity);

@@ -32,7 +32,7 @@ public class PlayerController extends InputAdapter{
     private boolean pressShoot;
 
     public void updateMovement(){
-        if(pressUp){
+        if(pressUp){ // TODO MOVED TO INPUT PROCESSING SYSTEM - delete
             tmp.add(0,0,1);
         }
         if(pressDown){
@@ -71,7 +71,6 @@ public class PlayerController extends InputAdapter{
         callback.setRayToWorld(cameraRay.getEndPoint(new Vector3(),50));
         callback.setCollisionFilterGroup(Physics.OBJECT_FLAG);
         callback.setCollisionFilterMask(Physics.ALL_FLAG);
-
 
         collisionWorld.rayTest(cameraRay.origin,cameraRay.getEndPoint(new Vector3(),50),callback);
 
