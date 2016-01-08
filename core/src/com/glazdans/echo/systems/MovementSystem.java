@@ -5,9 +5,9 @@ import com.artemis.ComponentMapper;
 import com.artemis.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
-import com.glazdans.echo.components.MovementComponent;
-import com.glazdans.echo.components.PlayerComponent;
-import com.glazdans.echo.components.TransformComponent;
+import com.glazdans.echo.component.MovementComponent;
+import com.glazdans.echo.component.PlayerComponent;
+import com.glazdans.echo.component.TransformComponent;
 
 public class MovementSystem extends IteratingSystem {
     ComponentMapper<MovementComponent> mMovement;

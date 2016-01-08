@@ -3,7 +3,7 @@ package com.glazdans.echo.utils;
 import com.artemis.World;
 import com.badlogic.gdx.physics.bullet.collision.btCapsuleShape;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
-import com.glazdans.echo.components.*;
+import com.glazdans.echo.component.*;
 
 public class EntityFactory {
 

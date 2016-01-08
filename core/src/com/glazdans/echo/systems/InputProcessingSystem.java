@@ -3,14 +3,11 @@ package com.glazdans.echo.systems;
 import com.artemis.Aspect;
 import com.artemis.BaseEntitySystem;
 import com.artemis.ComponentMapper;
-import com.artemis.EntitySystem;
 import com.artemis.utils.IntBag;
-import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.math.Vector3;
-import com.glazdans.echo.Input;
-import com.glazdans.echo.components.InputComponent;
-import com.glazdans.echo.components.MovementComponent;
-import com.glazdans.echo.components.PlayerComponent;
+import com.glazdans.echo.component.InputComponent;
+import com.glazdans.echo.component.MovementComponent;
+import com.glazdans.echo.component.PlayerComponent;
 
 public class InputProcessingSystem extends BaseEntitySystem {
     ComponentMapper<InputComponent> mInput;
