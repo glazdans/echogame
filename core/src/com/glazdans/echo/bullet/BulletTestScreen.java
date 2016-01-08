@@ -57,7 +57,8 @@ public class BulletTestScreen implements Screen {
         camera.lookAt(0,0,0);
         camera.far=100000000;
 
-        cameraObject = GameObjectFactory.getPlayer(physics.collisionWorld,gameObjects);
+        //GameObjectFactory.createObjects(BulletTestScreen.gameObjects);
+        cameraObject = GameObjectFactory.getPlayer(gameObjects);
         playerController = new PlayerController(cameraObject,camera,physics.collisionWorld);
         inputMultiplexer = new InputMultiplexer();
         cameraInputController = new CameraInputController(camera);
@@ -71,7 +72,7 @@ public class BulletTestScreen implements Screen {
             GameObject gameObject = new GameObject(shape,false);
             gameObject.rigidBody.userData = gameObject;
 
-            physics.collisionWorld.addCollisionObject(gameObject.rigidBody);
+            physics.addStaticObject(gameObject);
             gameObjects.add(gameObject);
         }
 

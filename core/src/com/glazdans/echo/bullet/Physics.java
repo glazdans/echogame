@@ -1,5 +1,6 @@
 package com.glazdans.echo.bullet;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.DebugDrawer;
@@ -29,7 +30,6 @@ public class Physics implements Disposable {
 
     private Physics(){
         init();
-        instance = this;
     }
 
     public static Physics getInstance(){
@@ -44,57 +44,20 @@ public class Physics implements Disposable {
         broadphase = new btDbvtBroadphase();
         collisionWorld = new btCollisionWorld(dispatcher,broadphase,collisionConfig);
         contactListener = new MyContactListener();
-        //GameObjectFactory.createObjects(collisionWorld,BulletTestScreen.gameObjects);
-
     }
+    public static void addStaticObject(GameObject gameObject){
+        getInstance().collisionWorld.addCollisionObject(gameObject.rigidBody,GROUND_FLAG,OBJECT_FLAG);
+    }
+
+    public static void addDynamicObject(GameObject gameObject){
+        getInstance().collisionWorld.addCollisionObject(gameObject.rigidBody,OBJECT_FLAG,ALL_FLAG);
+    }
+
     public void setDebugDrawer(DebugDrawer debugDrawer){
         collisionWorld.setDebugDrawer(debugDrawer);
     }
 
-    public static float lastDistanceFromGroundAvgDist;
-    private static Vector3[] rectVectors = new Vector3[]{new Vector3(), new Vector3(), new Vector3(), new Vector3()};
-    private ClosestRayResultCallback staticRayCallback;
-    public void castRayStaticOnly(Vector3 position, Vector3 end) {
-        if (staticRayCallback == null) {
-            staticRayCallback = new ClosestRayResultCallback(position, end);/*
-            staticRayCallback.setCollisionFilterGroup(DYNAMIC_ENTITIES);
-            staticRayCallback.setCollisionFilterMask(STATIC_GEOMETRY);*/
-        }
-        staticRayCallback.setCollisionObject(null);
-        staticRayCallback.setClosestHitFraction(1f);
-        staticRayCallback.setRayFromWorld(position);
-        staticRayCallback.setRayToWorld(end);
-        executeRayCast(position, end, staticRayCallback);
-    }
-    private void executeRayCast(Vector3 position, Vector3 end, RayResultCallback callback) {
-        raycastReport.reset();
-        collisionWorld.rayTest(position, end, callback);
-        raycastReport.hit = callback.hasHit();
-        if (raycastReport.hit) {
-            float length = position.dst(end);
-            raycastReport.hitDistance = length * callback.getClosestHitFraction();
-            if (callback instanceof ClosestRayResultCallback) {
-                ClosestRayResultCallback cb = (ClosestRayResultCallback) callback;
-                Vector3 normal = tmp;
-                cb.getHitNormalWorld(tmp);
-                raycastReport.hitNormal.set(normal.x, normal.y, normal.z);
-            }
-        }
-    }
-    public RaycastReport raycastReport = new RaycastReport();
-    public static class RaycastReport {
-        public boolean hit;
-        public Vector3 hitNormal = new Vector3();
-        public float hitDistance;
-
-        public void reset() {
-            hit = false;
-            hitNormal.setZero();
-            hitDistance = -1f;
-        }
-    }
-
-    public float distanceFromGroundFast(Vector3 position, Vector3 dimen) {
+  /*  public float distanceFromGroundFast(Vector3 position, Vector3 dimen) { // TODO DELETE WHEN SAFE
         float hitDist = Float.NaN;
         float downStep = 2f + dimen.y; // length of ray
         float rayOriginHeight = 0f;
@@ -111,6 +74,26 @@ public class Physics implements Disposable {
         }
         lastDistanceFromGroundAvgDist = hitDist;
         return hitDist;
+    }*/
+
+    ClosestRayResultCallback groundDistanceCallback = new ClosestRayResultCallback(new Vector3(),new Vector3());
+
+    public float distanceToGround(Vector3 position, float halfDistance){
+        groundDistanceCallback.setRayFromWorld(position);
+        Vector3 directionVector = new Vector3(0,-1,0);
+        directionVector.scl(10).add(position);
+        groundDistanceCallback.setRayToWorld(directionVector);
+        groundDistanceCallback.setClosestHitFraction(1f);
+        groundDistanceCallback.setCollisionObject(null);
+        groundDistanceCallback.setCollisionFilterGroup(OBJECT_FLAG);
+        groundDistanceCallback.setCollisionFilterMask(GROUND_FLAG);
+        collisionWorld.rayTest(position,directionVector,groundDistanceCallback);
+
+        if(groundDistanceCallback.hasHit()){
+            float length = position.dst(directionVector) *  groundDistanceCallback.getClosestHitFraction();
+            return length - halfDistance;
+        }
+        return Float.NaN;
     }
 
     class MyContactListener extends ContactListener {

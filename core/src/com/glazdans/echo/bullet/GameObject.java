@@ -1,6 +1,7 @@
 package com.glazdans.echo.bullet;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector2;
@@ -61,30 +62,37 @@ public class GameObject {
     private static Vector3 tmp = new Vector3();
     private static Vector2 directionVector = new Vector2();
     public void update(float delta,btCollisionWorld world){
-        handleCollisions(); // TODO HANDLE GROUND MOVEMENT :)
+        if(!isDynamic){
+            return;
+        }
+        //world.updateAabbs();
+        if(Gdx.input.isKeyJustPressed(Input.Keys.SHIFT_LEFT)){
+            position.y += 1f;
+        }
+        handleCollisions();
 
-        distanceFromGround = Physics.getInstance().distanceFromGroundFast(position,new Vector3(0,-5,0));
-        int groundRayHits = 0;
-        float avgDist = Physics.lastDistanceFromGroundAvgDist;
+        distanceFromGround = Physics.getInstance().distanceToGround(position,2f);
         // when the ray went the full length and did not hit the ground, NaN is the return value
         isGrounded = false;
         float embedThreshold = 0f;
+
         if (!Float.isNaN(distanceFromGround)) {
-            Vector3 vel = velocity;
             if (distanceFromGround < 0.1f) {
                 adjustPosition(tmp.set(0f, -distanceFromGround, 0f));
-                if (vel.y < 0f) vel.y = 0f;
+                if (velocity.y < 0f) velocity.y = 0f;
                 isGrounded = true;
             }
-            if (distanceFromGround < embedThreshold && groundRayHits == 4 && avgDist <= 0f) {
+            if (distanceFromGround < embedThreshold ) {
                 // penetrating into the ground
                 position.y += -distanceFromGround;
-            } else if (distanceFromGround > 0f) {
+                isGrounded = true;
+            } else if (distanceFromGround >= 0f) {
                 Vector3 velocity = this.velocity;
                 // cap velocity to distance from ground
                 if (velocity.y < 0 && distanceFromGround - velocity.y <= 0f) {
                     velocity.y = -distanceFromGround;
                     System.out.println("cap velocity: " + velocity.y);
+                    isGrounded = true;
                 }
             }
         }
@@ -106,10 +114,9 @@ public class GameObject {
         }else{
             acceleration.y = 0;
         }
-        Gdx.app.log("IsGrounded",Boolean.toString(isGrounded));*/
+        Gdx.app.log("IsGrounded",Boolean.toString(isGrounded));*//*
         Gdx.app.log("IsGrounded",Boolean.toString(isGrounded));
-
-        Gdx.app.log("DistanceFromGround",Float.toString(distanceFromGround));
+        Gdx.app.log("DistanceFromGround",Float.toString(distanceFromGround));*/
 
         tmp.set(acceleration);
         tmp.scl(delta);
@@ -127,7 +134,6 @@ public class GameObject {
         position.add(tmp);
         transform.set(position,rotation);
         rigidBody.setWorldTransform(transform);
-
     }
 
     public void shoot(){
