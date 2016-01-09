@@ -141,7 +141,7 @@ public class GameObject {
         Vector3 startingPosition = new Vector3(direction);
         startingPosition.scl(1f).add(position);
         Projectile projectile = new Projectile(startingPosition,direction,21f,Physics.getInstance().collisionWorld);
-        BulletTestScreen.projectiles.add(projectile);
+        //BulletTestScreen.projectiles.add(projectile);
     }
 
     public void handleCollisions() {

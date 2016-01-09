@@ -5,19 +5,31 @@ import com.artemis.BaseEntitySystem;
 import com.artemis.ComponentMapper;
 import com.artemis.utils.IntBag;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 import com.glazdans.echo.component.InputComponent;
 import com.glazdans.echo.component.MovementComponent;
 import com.glazdans.echo.component.PlayerComponent;
+import com.glazdans.echo.events.Event;
+import com.glazdans.echo.events.EventDispatcher;
+import com.glazdans.echo.events.EventReceiver;
+import com.glazdans.echo.events.EventType;
 
-public class InputProcessingSystem extends BaseEntitySystem {
+public class InputProcessingSystem extends BaseEntitySystem implements EventReceiver {
     ComponentMapper<InputComponent> mInput;
     ComponentMapper<MovementComponent> mMovement;
     ComponentMapper<PlayerComponent> mPlayer;
 
+    private Array<Event> eventQueue;
 
+    @Override
+    public void addEvent(Event event) {
+        eventQueue.add(event);
+    }
 
     public InputProcessingSystem(){
         super(Aspect.all(InputComponent.class,MovementComponent.class,PlayerComponent.class));
+        eventQueue = new Array<>();
+        EventDispatcher.getInstance().addReceiver(EventType.ActionEvent, this);
     }
 
     @Override

@@ -32,7 +32,6 @@ import com.glazdans.echo.utils.EntityFactory;
 import java.util.ArrayList;
 
 public class BulletTestScreen implements Screen {
-    public static Array<Projectile> projectiles = new Array<>();
     public static Array<GameObject> gameObjects = new Array<>();
 
     final GdxGame gdxGame;
@@ -110,10 +109,10 @@ public class BulletTestScreen implements Screen {
 
         playerController.updateMovement();
 
-        for (Projectile projectile : projectiles) {
+      /*  for (Projectile projectile : projectiles) {
             projectile.update(delta);
         }
-
+        */
         cameraObject.update(delta,Physics.getInstance().collisionWorld);
 
         //camera.position.set(cameraObjectVector.x,cameraHeight,cameraObjectVector.z-3);

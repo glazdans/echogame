@@ -1,7 +1,6 @@
 package com.glazdans.echo.physics;
 
 import com.badlogic.gdx.math.Vector2;
-import com.glazdans.echo.Entity;
 
 /**
  * Created by georgs.lazdans on 2015.10.17..
