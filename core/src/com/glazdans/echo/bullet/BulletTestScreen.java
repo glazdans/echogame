@@ -23,10 +23,7 @@ import com.badlogic.gdx.physics.bullet.linearmath.btMotionState;
 import com.badlogic.gdx.utils.Array;
 import com.glazdans.echo.GdxGame;
 import com.glazdans.echo.bullet.input.PlayerController;
-import com.glazdans.echo.systems.InputProcessingSystem;
-import com.glazdans.echo.systems.MovementSystem;
-import com.glazdans.echo.systems.PhysicsDebugDrawerSystem;
-import com.glazdans.echo.systems.PhysicsSystem;
+import com.glazdans.echo.systems.*;
 import com.glazdans.echo.utils.EntityFactory;
 
 import java.util.ArrayList;
@@ -50,21 +47,26 @@ public class BulletTestScreen implements Screen {
 
     int cameraEntity;
 
+    InputSystem inputSystem;
+
     public BulletTestScreen(GdxGame game){
         this.gdxGame = game;
         Bullet.init();
         Physics.getInstance();
 
+        inputSystem = new InputSystem();
+
         WorldConfiguration configuration = new WorldConfigurationBuilder()
                 .with(new InputProcessingSystem(),
                         new MovementSystem(),
                         new PhysicsSystem(),
-                        new PhysicsDebugDrawerSystem())
+                        new PhysicsDebugDrawerSystem(),
+                        inputSystem)
                 .build();
         world = new World(configuration);
 
         cameraEntity = EntityFactory.playerEntity(world);
-
+        inputSystem.setPlayer1Id(cameraEntity);
 
 
         camera = new PerspectiveCamera(60,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
@@ -84,12 +86,13 @@ public class BulletTestScreen implements Screen {
             gameObjects.add(gameObject);
         }
 
-        cameraObject = GameObjectFactory.getPlayer(gameObjects);
+        //cameraObject = GameObjectFactory.getPlayer(gameObjects);
         playerController = new PlayerController(cameraObject,camera,Physics.getInstance().collisionWorld);
         inputMultiplexer = new InputMultiplexer();
         cameraInputController = new CameraInputController(camera);
-        inputMultiplexer.addProcessor(playerController);
+        //inputMultiplexer.addProcessor(playerController);
         inputMultiplexer.addProcessor(cameraInputController);
+        inputMultiplexer.addProcessor(inputSystem);
         Gdx.input.setInputProcessor(inputMultiplexer);
     }
 
@@ -107,13 +110,13 @@ public class BulletTestScreen implements Screen {
         world.setDelta(delta);
         world.process();
 
-        playerController.updateMovement();
+        //playerController.updateMovement();
 
       /*  for (Projectile projectile : projectiles) {
             projectile.update(delta);
         }
         */
-        cameraObject.update(delta,Physics.getInstance().collisionWorld);
+        //cameraObject.update(delta,Physics.getInstance().collisionWorld);
 
         //camera.position.set(cameraObjectVector.x,cameraHeight,cameraObjectVector.z-3);
         //camera.lookAt(cameraObject.position);

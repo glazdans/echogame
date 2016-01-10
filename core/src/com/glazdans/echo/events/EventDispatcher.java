@@ -43,7 +43,7 @@ public class EventDispatcher {
     public void addEvent(Event event){
         Array<EventReceiver> eventReceivers = receiverMap.get(event.eventType);
         if(eventReceivers == null){
-            Gdx.app.log("EventDispatcher", "No receivers for event:" + event.eventType.toString());
+            Gdx.app.log("EventDispatcher", "No receivers for event: " + event.eventType.toString());
         }
 
         for (EventReceiver eventReceiver : eventReceivers) {

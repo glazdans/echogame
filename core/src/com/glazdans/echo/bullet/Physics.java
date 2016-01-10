@@ -49,8 +49,8 @@ public class Physics implements Disposable {
         getInstance().collisionWorld.addCollisionObject(gameObject.rigidBody,GROUND_FLAG,OBJECT_FLAG);
     }
 
-    public static void addDynamicObject(GameObject gameObject){
-        getInstance().collisionWorld.addCollisionObject(gameObject.rigidBody,OBJECT_FLAG,ALL_FLAG);
+    public static void addDynamicObject(btCollisionObject object){
+        getInstance().collisionWorld.addCollisionObject(object,OBJECT_FLAG,ALL_FLAG);
     }
 
     public void setDebugDrawer(DebugDrawer debugDrawer){

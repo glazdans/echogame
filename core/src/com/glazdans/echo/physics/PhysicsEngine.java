@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.Array;
 
 @Deprecated
 public class PhysicsEngine {
-    public Array<Entity> collisionList;
+    /*public Array<Entity> collisionList;
 
     public PhysicsEngine(){
         collisionList = new Array<>();
@@ -122,6 +122,6 @@ public class PhysicsEngine {
             }
         }
         return false;
-    }
+    }*/
 
 }

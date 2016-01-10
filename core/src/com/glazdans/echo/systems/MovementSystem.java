@@ -6,6 +6,7 @@ import com.artemis.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.glazdans.echo.component.MovementComponent;
+import com.glazdans.echo.component.PhysicsComponent;
 import com.glazdans.echo.component.PlayerComponent;
 import com.glazdans.echo.component.TransformComponent;
 
@@ -13,6 +14,7 @@ public class MovementSystem extends IteratingSystem {
     ComponentMapper<MovementComponent> mMovement;
     ComponentMapper<TransformComponent> mTransform;
     ComponentMapper<PlayerComponent> mPlayer;
+    ComponentMapper<PhysicsComponent> mPhysics;
 
     public MovementSystem(){
         super(Aspect.all(MovementComponent.class, TransformComponent.class));
@@ -25,6 +27,10 @@ public class MovementSystem extends IteratingSystem {
         float delta = world.getDelta();
         TransformComponent transform = mTransform.get(entityId);
         MovementComponent movement = mMovement.get(entityId);
+        PlayerComponent playerComponent = mPlayer.get(entityId);
+        if(playerComponent != null){
+
+        }
 
         Vector3 velocity = movement.velocity;
         Vector3 position = transform.position;
@@ -50,6 +56,11 @@ public class MovementSystem extends IteratingSystem {
         tmp.scl(delta);
         position.add(tmp);
         transform.transform.set(position, transform.rotation);
+
+        PhysicsComponent physicsComponent = mPhysics.get(entityId);
+        if(physicsComponent != null){
+            physicsComponent.collisionObject.setWorldTransform(transform.transform);
+        }
         //TODO IMPLEMENT IN PHYSICS
         //rigidBody.setWorldTransform(transform);
     }

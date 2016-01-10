@@ -62,7 +62,7 @@ public class GameObjectFactory {
         gameObject.rigidBody.setWorldTransform(new Matrix4().setTranslation(0,5,0));
         gameObject.rigidBody.setCollisionFlags(btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
         gameObject.rigidBody.userData = gameObject;
-        Physics.addDynamicObject(gameObject);
+        Physics.addDynamicObject(gameObject.rigidBody);
 
         gameObjects.add(gameObject);
         return gameObject;
