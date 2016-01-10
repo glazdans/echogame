@@ -134,12 +134,16 @@ public class Physics implements Disposable {
         /** this is where the magic happens! */
         private void entityCollision(Integer entityId, Vector3 normal, Vector3 myPoint, Vector3 otherPoint, float dist, Integer otherEntityId) {
             if (Math.abs(dist) < 0.01f) return; // ignoring tiny collisions seems to help stability?
+            MovementComponent movementComponent = BulletTestScreen.world.getMapper(MovementComponent.class).get(entityId);
+            if(movementComponent == null){
+                return;
+            }
 
             // Change Position
             tmp.set(myPoint).sub(otherPoint).nor().add(normal); // direction of vel + normal
             tmp.nor();
             Vector3 posDelta = tmp3.set(tmp).scl(dist);
-            MovementComponent movementComponent = BulletTestScreen.world.getMapper(MovementComponent.class).get(entityId);
+
             movementComponent.positionChange.add(posDelta);
             movementComponent.positionChangeCount++;
             //ent.addCollisionPositionChange(posDelta);

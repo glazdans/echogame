@@ -2,6 +2,7 @@ package com.glazdans.echo.utils;
 
 import com.artemis.World;
 import com.badlogic.gdx.physics.bullet.Bullet;
+import com.badlogic.gdx.physics.bullet.collision.Collision;
 import com.badlogic.gdx.physics.bullet.collision.btCapsuleShape;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
@@ -21,6 +22,11 @@ public class EntityFactory {
         PhysicsComponent component = world.getMapper(PhysicsComponent.class).create(entity);
         btCapsuleShape capsuleShape = new btCapsuleShape(0.5f,3f);
         btCollisionObject collisionObject = new btCollisionObject();
+
+        // Maybe not needed
+        collisionObject.setActivationState(Collision.DISABLE_DEACTIVATION);
+        collisionObject.setCollisionFlags(btCollisionObject.CollisionFlags.CF_CUSTOM_MATERIAL_CALLBACK);
+
         collisionObject.setCollisionShape(capsuleShape);
         component.setCollisionObject(collisionObject);
 
