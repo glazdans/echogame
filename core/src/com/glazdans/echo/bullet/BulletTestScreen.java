@@ -29,11 +29,8 @@ import com.glazdans.echo.utils.EntityFactory;
 import java.util.ArrayList;
 
 public class BulletTestScreen implements Screen {
-    public static Array<GameObject> gameObjects = new Array<>();
-
     final GdxGame gdxGame;
 
-    GameObject cameraObject;
     PlayerController playerController;
     CameraInputController cameraInputController;
     InputMultiplexer inputMultiplexer;
@@ -42,7 +39,7 @@ public class BulletTestScreen implements Screen {
     public static PerspectiveCamera camera;
 
     ModelLoader modelLoader;
-    World world;
+    public static World world;
 
 
     int cameraEntity;
@@ -78,16 +75,12 @@ public class BulletTestScreen implements Screen {
         modelLoader = new ModelLoader();
         Array<Node> modelNodes = modelLoader.loadModel().nodes;
         for (Node modelNode : modelNodes) {
-            btCollisionShape shape = Bullet.obtainStaticNodeShape(modelNode,true);
-            GameObject gameObject = new GameObject(shape,false);
-            gameObject.rigidBody.userData = gameObject;
-
-            Physics.addStaticObject(gameObject);
-            gameObjects.add(gameObject);
+            btCollisionShape shape = Bullet.obtainStaticNodeShape(modelNode, true);
+            int entityId = EntityFactory.createStaticObject(shape,world);
         }
 
         //cameraObject = GameObjectFactory.getPlayer(gameObjects);
-        playerController = new PlayerController(cameraObject,camera,Physics.getInstance().collisionWorld);
+        //playerController = new PlayerController(cameraObject,camera,Physics.getInstance().collisionWorld);
         inputMultiplexer = new InputMultiplexer();
         cameraInputController = new CameraInputController(camera);
         //inputMultiplexer.addProcessor(playerController);
@@ -127,8 +120,6 @@ public class BulletTestScreen implements Screen {
 
         if(Gdx.input.isKeyJustPressed(Input.Keys.SPACE)){
             new Boolean("fak this hsit");
-            cameraObject.position.y = 10;
-            cameraObject.velocity.y = 0;
         }
         if(Gdx.input.isKeyJustPressed(Input.Keys.PLUS)){
 

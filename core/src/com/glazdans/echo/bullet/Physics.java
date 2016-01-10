@@ -1,13 +1,11 @@
 package com.glazdans.echo.bullet;
 
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.DebugDrawer;
 import com.badlogic.gdx.physics.bullet.collision.*;
-import com.badlogic.gdx.physics.bullet.dynamics.btRigidBody;
-import com.badlogic.gdx.physics.bullet.linearmath.btIDebugDraw;
 import com.badlogic.gdx.utils.Disposable;
+import com.glazdans.echo.component.MovementComponent;
 
 public class Physics implements Disposable {
     private static Physics instance;
@@ -45,8 +43,8 @@ public class Physics implements Disposable {
         collisionWorld = new btCollisionWorld(dispatcher,broadphase,collisionConfig);
         contactListener = new MyContactListener();
     }
-    public static void addStaticObject(GameObject gameObject){
-        getInstance().collisionWorld.addCollisionObject(gameObject.rigidBody,GROUND_FLAG,OBJECT_FLAG);
+    public static void addStaticObject(btCollisionObject object){
+        getInstance().collisionWorld.addCollisionObject(object,GROUND_FLAG,OBJECT_FLAG);
     }
 
     public static void addDynamicObject(btCollisionObject object){
@@ -99,11 +97,11 @@ public class Physics implements Disposable {
     class MyContactListener extends ContactListener {
         @Override
         public boolean onContactAdded(btManifoldPoint cp, btCollisionObject colObj0, int partId0, int index0, btCollisionObject colObj1, int partId1, int index1) {
-            GameObject a = getEntity(colObj0);
-            GameObject b = getEntity(colObj1);
-            if(a == null || b == null){
-                return false;
-            }
+            Integer a = (Integer) colObj0.userData;
+            Integer b = (Integer) colObj1.userData;
+
+            Gdx.app.log("A: ",a.toString());
+            Gdx.app.log("B: ",b.toString());
             if (a != null || b != null) {
                 // the distance between the point on body A that collided and the point on body B that collided
                 float dist = cp.getDistance();
@@ -123,6 +121,9 @@ public class Physics implements Disposable {
         }
         private GameObject getEntity(btCollisionObject obj) {
             if (obj.userData instanceof GameObject) return (GameObject) obj.userData;
+            if(obj.userData instanceof Integer){
+
+            }
             return null;
         }
 
@@ -131,19 +132,22 @@ public class Physics implements Disposable {
         private Vector3 worldB = new Vector3();
 
         /** this is where the magic happens! */
-        private void entityCollision(GameObject ent, Vector3 normal, Vector3 myPoint, Vector3 otherPoint, float dist, GameObject otherEntity) {
+        private void entityCollision(Integer entityId, Vector3 normal, Vector3 myPoint, Vector3 otherPoint, float dist, Integer otherEntityId) {
             if (Math.abs(dist) < 0.01f) return; // ignoring tiny collisions seems to help stability?
 
             // Change Position
             tmp.set(myPoint).sub(otherPoint).nor().add(normal); // direction of vel + normal
             tmp.nor();
             Vector3 posDelta = tmp3.set(tmp).scl(dist);
-            ent.addCollisionPositionChange(posDelta);
+            MovementComponent movementComponent = BulletTestScreen.world.getMapper(MovementComponent.class).get(entityId);
+            movementComponent.positionChange.add(posDelta);
+            movementComponent.positionChangeCount++;
+            //ent.addCollisionPositionChange(posDelta);
 
             // Change Velocity
             // slide along the faces of geometry, but bounce off other entities
-            Vector3 vel = ent.velocity;
-            boolean bounce = otherEntity != null;
+            Vector3 vel = movementComponent.velocity;
+            boolean bounce = otherEntityId != null;
             if (!bounce) {
                 // slide along the wall
                 // TODO don't slide "up" vertical inclines of a certain steepness

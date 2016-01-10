@@ -19,7 +19,7 @@ public class GameObjectFactory {
         btRigidBody.btRigidBodyConstructionInfo constructionInfo = new btRigidBody.btRigidBodyConstructionInfo(mass, null, box, localInertia);
         GameObject gameObject = new GameObject(box, false);
         gameObject.rigidBody.userData = gameObject;
-        Physics.addStaticObject(gameObject);
+        Physics.addStaticObject(gameObject.rigidBody);
         gameObjects.add(gameObject);
 
         // WALL
@@ -32,7 +32,7 @@ public class GameObjectFactory {
         gameObject = new GameObject(wall, false);
         gameObject.rigidBody.userData = gameObject;
         gameObject.rigidBody.setWorldTransform(new Matrix4().translate(0, 9, 11));
-        Physics.addStaticObject(gameObject);
+        Physics.addStaticObject(gameObject.rigidBody);
         gameObjects.add(gameObject);
 
 
@@ -46,7 +46,7 @@ public class GameObjectFactory {
         gameObject = new GameObject(box, true);
         gameObject.rigidBody.userData = gameObject;
         gameObject.rigidBody.setWorldTransform(new Matrix4().translate(new Vector3(0, 5, 0)));
-        Physics.addStaticObject(gameObject);
+        Physics.addStaticObject(gameObject.rigidBody);
         gameObjects.add(gameObject);
     }
     public static GameObject getPlayer(Array<GameObject> gameObjects){

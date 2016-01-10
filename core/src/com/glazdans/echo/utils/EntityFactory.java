@@ -1,8 +1,11 @@
 package com.glazdans.echo.utils;
 
 import com.artemis.World;
+import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.physics.bullet.collision.btCapsuleShape;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
+import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
+import com.glazdans.echo.bullet.GameObject;
 import com.glazdans.echo.bullet.Physics;
 import com.glazdans.echo.component.*;
 
@@ -21,7 +24,25 @@ public class EntityFactory {
         collisionObject.setCollisionShape(capsuleShape);
         component.setCollisionObject(collisionObject);
 
+        collisionObject.userData = entity;
+
         Physics.getInstance().addDynamicObject(collisionObject);
+
+        return entity;
+    }
+
+    public static int createStaticObject(btCollisionShape shape, World world){
+        int entity = world.create();
+        TransformComponent transformComponent = world.getMapper(TransformComponent.class).create(entity);
+
+        PhysicsComponent component = world.getMapper(PhysicsComponent.class).create(entity);
+        btCollisionObject collisionObject = new btCollisionObject();
+        collisionObject.setCollisionShape(shape);
+        component.setCollisionObject(collisionObject);
+
+        collisionObject.userData = entity;
+
+        Physics.addStaticObject(collisionObject);
 
         return entity;
     }
