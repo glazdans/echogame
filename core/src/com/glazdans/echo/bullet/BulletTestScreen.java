@@ -87,6 +87,8 @@ public class BulletTestScreen implements Screen {
         inputMultiplexer.addProcessor(cameraInputController);
         inputMultiplexer.addProcessor(inputSystem);
         Gdx.input.setInputProcessor(inputMultiplexer);
+
+        EntityFactory.createEnemyObject(world,new Vector3(10,10,0));
     }
 
     @Override
@@ -157,5 +159,6 @@ public class BulletTestScreen implements Screen {
     @Override
     public void dispose() {
         Physics.getInstance().dispose();
+        world.dispose();
     }
 }

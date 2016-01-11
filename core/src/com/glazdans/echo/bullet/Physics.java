@@ -4,11 +4,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.bullet.DebugDrawer;
 import com.badlogic.gdx.physics.bullet.collision.*;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.glazdans.echo.component.MovementComponent;
 
 public class Physics implements Disposable {
     private static Physics instance;
+    public Array<Disposable> disposables;
 
     private static Vector3 tmp = new Vector3();
     private static Vector3 tmp2 = new Vector3();
@@ -42,6 +44,7 @@ public class Physics implements Disposable {
         broadphase = new btDbvtBroadphase();
         collisionWorld = new btCollisionWorld(dispatcher,broadphase,collisionConfig);
         contactListener = new MyContactListener();
+        disposables = new Array<>();
     }
     public static void addStaticObject(btCollisionObject object){
         getInstance().collisionWorld.addCollisionObject(object,GROUND_FLAG,OBJECT_FLAG);
@@ -100,8 +103,6 @@ public class Physics implements Disposable {
             Integer a = (Integer) colObj0.userData;
             Integer b = (Integer) colObj1.userData;
 
-            Gdx.app.log("A: ",a.toString());
-            Gdx.app.log("B: ",b.toString());
             if (a != null || b != null) {
                 // the distance between the point on body A that collided and the point on body B that collided
                 float dist = cp.getDistance();
@@ -190,5 +191,8 @@ public class Physics implements Disposable {
         dispatcher.dispose();
         collisionWorld.dispose();
         contactListener.dispose();
+        for (Disposable disposable : disposables) {
+            disposable.dispose();
+        }
     }
 }
