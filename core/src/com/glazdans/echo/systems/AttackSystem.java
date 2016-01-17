@@ -9,11 +9,13 @@ import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
 import com.badlogic.gdx.utils.Array;
 import com.glazdans.echo.bullet.Physics;
 import com.glazdans.echo.component.TransformComponent;
+import com.glazdans.echo.component.WeaponComponent;
 import com.glazdans.echo.events.EventDispatcher;
 import com.glazdans.echo.events.HitEvent;
 
 public class AttackSystem extends BaseEntitySystem {
     ComponentMapper<TransformComponent> mTransform;
+    ComponentMapper<WeaponComponent> mWeapon;
 
     Array<Integer> entitiesWhichAreAttacking;
 
@@ -31,6 +33,12 @@ public class AttackSystem extends BaseEntitySystem {
     @Override
     protected void processSystem() {
         for (Integer entityId : entitiesWhichAreAttacking) {
+            WeaponComponent weaponComponent = mWeapon.get(entityId);
+            if(weaponComponent.currentTime < weaponComponent.timeBetweenShots){
+                continue;
+            }
+
+
             TransformComponent transform = mTransform.get(entityId);
             Vector3 fak = new Vector3(0,0,1);
             fak.mul(transform.rotation).nor();
@@ -41,7 +49,8 @@ public class AttackSystem extends BaseEntitySystem {
 
             fak.scl(30);// TODO MAKE BETTER NAMES FOR VARIABLES
             Vector3 direction = fak.add(transform.position);
-            shoot(tmp, direction);
+            shoot(tmp.add(0,1,0), direction);
+            weaponComponent.currentTime = 0;
 
             if(callback.hasHit()){
                 HitEvent hitEvent = new HitEvent();

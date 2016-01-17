@@ -32,13 +32,11 @@ public class EntityFactory {
 
         collisionObject.userData = entity;
 
-        AttackComponent attack = world.getMapper(AttackComponent.class).create(entity);
-        WeaponFactory.defaultWeapon(attack);
-
         WeaponComponent weapon = world.getMapper(WeaponComponent.class).create(entity);
         KnockbackEffect knockbackEffect = new KnockbackEffect();
-        knockbackEffect.knockbackStrength = 1f;
+        knockbackEffect.knockbackStrength = 30f;
         weapon.weaponEffects.add(knockbackEffect);
+        WeaponFactory.defaultWeapon(weapon);
 
         Physics.getInstance().addDynamicObject(collisionObject);
         Physics.getInstance().disposables.add(capsuleShape);
