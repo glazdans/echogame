@@ -9,6 +9,8 @@ import com.badlogic.gdx.physics.bullet.collision.ClosestRayResultCallback;
 import com.badlogic.gdx.utils.Array;
 import com.glazdans.echo.bullet.Physics;
 import com.glazdans.echo.component.TransformComponent;
+import com.glazdans.echo.events.EventDispatcher;
+import com.glazdans.echo.events.HitEvent;
 
 public class AttackSystem extends BaseEntitySystem {
     ComponentMapper<TransformComponent> mTransform;
@@ -28,8 +30,8 @@ public class AttackSystem extends BaseEntitySystem {
     private static Vector3 tmp1 = new Vector3();
     @Override
     protected void processSystem() {
-        for (Integer integer : entitiesWhichAreAttacking) {
-            TransformComponent transform = mTransform.get(integer);
+        for (Integer entityId : entitiesWhichAreAttacking) {
+            TransformComponent transform = mTransform.get(entityId);
             Vector3 fak = new Vector3(0,0,1);
             fak.mul(transform.rotation).nor();
             tmp1.set(fak);
@@ -37,14 +39,22 @@ public class AttackSystem extends BaseEntitySystem {
             tmp.set(transform.position);
             tmp.add(tmp1.scl(0.65f));
 
-            fak.scl(30);
+            fak.scl(30);// TODO MAKE BETTER NAMES FOR VARIABLES
             Vector3 direction = fak.add(transform.position);
             shoot(tmp, direction);
 
             if(callback.hasHit()){
+                HitEvent hitEvent = new HitEvent();
+                callback.getHitNormalWorld(hitEvent.normal);
+                callback.getHitPointWorld(hitEvent.hitPoint);
+                hitEvent.entityShooterId = entityId;
+                hitEvent.entityShotId = (int) callback.getCollisionObject().userData;
+                EventDispatcher.getInstance().addEvent(hitEvent);
+
+                // Debug stuff - refactor to a better system;
                 Vector3 uh = new Vector3();
                 callback.getHitPointWorld(uh);
-                Gdx.app.log("Has hit at:",uh.toString());
+                //Gdx.app.log("Has hit at:",uh.toString());
                 PhysicsDebugDrawerSystem.from.set(tmp);
                 PhysicsDebugDrawerSystem.to.set(uh);
 

@@ -59,7 +59,8 @@ public class BulletTestScreen implements Screen {
                         new PhysicsSystem(),
                         new PhysicsDebugDrawerSystem(),
                         inputSystem,
-                        new AttackSystem())
+                        new AttackSystem(),
+                        new EffectSystem())
                 .build();
         world = new World(configuration);
 
