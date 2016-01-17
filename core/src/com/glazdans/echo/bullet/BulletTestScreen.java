@@ -58,7 +58,8 @@ public class BulletTestScreen implements Screen {
                         new MovementSystem(),
                         new PhysicsSystem(),
                         new PhysicsDebugDrawerSystem(),
-                        inputSystem)
+                        inputSystem,
+                        new AttackSystem())
                 .build();
         world = new World(configuration);
 
@@ -84,8 +85,8 @@ public class BulletTestScreen implements Screen {
         inputMultiplexer = new InputMultiplexer();
         cameraInputController = new CameraInputController(camera);
         //inputMultiplexer.addProcessor(playerController);
-        inputMultiplexer.addProcessor(cameraInputController);
         inputMultiplexer.addProcessor(inputSystem);
+        inputMultiplexer.addProcessor(cameraInputController);
         Gdx.input.setInputProcessor(inputMultiplexer);
 
         EntityFactory.createEnemyObject(world,new Vector3(10,10,0));

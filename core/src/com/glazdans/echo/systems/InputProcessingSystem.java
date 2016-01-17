@@ -9,14 +9,17 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.utils.Array;
 import com.glazdans.echo.component.MovementComponent;
 import com.glazdans.echo.component.PlayerComponent;
+import com.glazdans.echo.component.TransformComponent;
 import com.glazdans.echo.events.*;
 
 public class InputProcessingSystem extends BaseEntitySystem implements EventReceiver {
     ComponentMapper<MovementComponent> mMovement;
     ComponentMapper<PlayerComponent> mPlayer;
+    ComponentMapper<TransformComponent> mTransform;
 
     private final Array<Event> eventQueue;
 
+    AttackSystem attackSystem;
     @Override
     public void addEvent(Event event) {
         synchronized (eventQueue){
@@ -51,6 +54,13 @@ public class InputProcessingSystem extends BaseEntitySystem implements EventRece
         MovementComponent movement = mMovement.get(id);
         tmp.y = movement.acceleration.y;
         movement.acceleration.set(tmp);
+
+        TransformComponent transformComponent = mTransform.get(id);
+        transformComponent.rotation.setEulerAngles(event.degree,0,0);
+
+        if(event.shoot){
+            attackSystem.addShoot(id);
+        }
 
       /*  gameObject.updateAcceleration(tmp); TODO DELETE OLD CODE
 

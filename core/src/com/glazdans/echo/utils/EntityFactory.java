@@ -2,12 +2,10 @@ package com.glazdans.echo.utils;
 
 import com.artemis.World;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.physics.bullet.Bullet;
 import com.badlogic.gdx.physics.bullet.collision.Collision;
 import com.badlogic.gdx.physics.bullet.collision.btCapsuleShape;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
-import com.glazdans.echo.bullet.GameObject;
 import com.glazdans.echo.bullet.Physics;
 import com.glazdans.echo.component.*;
 
@@ -32,6 +30,9 @@ public class EntityFactory {
         component.setCollisionObject(collisionObject);
 
         collisionObject.userData = entity;
+
+        AttackComponent attack = world.getMapper(AttackComponent.class).create(entity);
+        WeaponFactory.defaultWeapon(attack);
 
         Physics.getInstance().addDynamicObject(collisionObject);
         Physics.getInstance().disposables.add(capsuleShape);
