@@ -8,6 +8,7 @@ import com.badlogic.gdx.physics.bullet.collision.btCollisionObject;
 import com.badlogic.gdx.physics.bullet.collision.btCollisionShape;
 import com.glazdans.echo.bullet.Physics;
 import com.glazdans.echo.component.*;
+import com.glazdans.echo.effects.KnockbackEffect;
 
 public class EntityFactory {
 
@@ -33,6 +34,11 @@ public class EntityFactory {
 
         AttackComponent attack = world.getMapper(AttackComponent.class).create(entity);
         WeaponFactory.defaultWeapon(attack);
+
+        WeaponComponent weapon = world.getMapper(WeaponComponent.class).create(entity);
+        KnockbackEffect knockbackEffect = new KnockbackEffect();
+        knockbackEffect.knockbackStrength = 1f;
+        weapon.weaponEffects.add(knockbackEffect);
 
         Physics.getInstance().addDynamicObject(collisionObject);
         Physics.getInstance().disposables.add(capsuleShape);
