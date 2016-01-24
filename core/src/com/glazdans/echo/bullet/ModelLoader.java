@@ -11,6 +11,8 @@ public class ModelLoader {
     Model model;
     G3dModelLoader modelLoader;
 
+    Model soldierModel;
+
     public ModelLoader(){
         UBJsonReader jsonReader = new UBJsonReader();
 
@@ -20,8 +22,12 @@ public class ModelLoader {
 
     public Model loadModel(){
         model = modelLoader.loadModel(Gdx.files.getFileHandle("model/testScene.g3dj", Files.FileType.Internal));
-        new Boolean("false");
         return model;
+    }
+
+    public Model loadSoldier(){
+        soldierModel = modelLoader.loadModel(Gdx.files.getFileHandle("model/soldier.g3dj", Files.FileType.Internal));
+        return soldierModel;
     }
 
 }

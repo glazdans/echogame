@@ -38,7 +38,7 @@ public class BulletTestScreen implements Screen {
 
     public static PerspectiveCamera camera;
 
-    ModelLoader modelLoader;
+    public static ModelLoader modelLoader;
     public static World world;
 
 
@@ -51,12 +51,18 @@ public class BulletTestScreen implements Screen {
         Bullet.init();
         Physics.getInstance();
 
+        camera = new PerspectiveCamera(60,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
+        camera.position.set(new Vector3(0 ,35,-5));
+        camera.lookAt(0,0,0);
+        modelLoader = new ModelLoader();
+
         inputSystem = new InputSystem();
 
         WorldConfiguration configuration = new WorldConfigurationBuilder()
                 .with(new InputProcessingSystem(),
                         new MovementSystem(),
                         new PhysicsSystem(),
+                        new RenderingSystem(),
                         new PhysicsDebugDrawerSystem(),
                         inputSystem,
                         new AttackSystem(),
@@ -68,14 +74,8 @@ public class BulletTestScreen implements Screen {
         cameraEntity = EntityFactory.playerEntity(world);
         inputSystem.setPlayer1Id(cameraEntity);
 
-
-        camera = new PerspectiveCamera(60,Gdx.graphics.getWidth(),Gdx.graphics.getHeight());
-        camera.position.set(new Vector3(0 ,35,-5));
-        camera.lookAt(0,0,0);
-
         //GameObjectFactory.createObjects(BulletTestScreen.gameObjects);
 
-        modelLoader = new ModelLoader();
         Array<Node> modelNodes = modelLoader.loadModel().nodes;
         for (Node modelNode : modelNodes) {
             btCollisionShape shape = Bullet.obtainStaticNodeShape(modelNode, true);

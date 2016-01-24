@@ -18,6 +18,7 @@ public class EntityFactory {
         TransformComponent transformComponent = world.getMapper(TransformComponent.class).create(entity);
         transformComponent.position.set(0,15,0);
         world.getMapper(MovementComponent.class).create(entity);
+        world.getMapper(RenderingComponent.class).create(entity);
 
         PhysicsComponent component = world.getMapper(PhysicsComponent.class).create(entity);
         btCapsuleShape capsuleShape = new btCapsuleShape(0.5f,3f);
